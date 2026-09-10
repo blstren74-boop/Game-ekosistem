@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feeding Frenzy: Ekosistem Laut Edition</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter & Pixel/Game Style -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fredoka', 'Inter', sans-serif;
+            user-select: none;
+            overflow: hidden;
+            background-color: #031226;
+        }
+        
+        .ocean-gradient {
+            background: radial-gradient(circle at 50% 8%, #1f639e 0%, #0d3862 35%, #051a33 70%, #020a16 100%);
+        }
+
+        .glass-card {
+            background: rgba(13, 37, 69, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+            box-shadow: 0 4px 15px rgba(0, 180, 219, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 180, 219, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 239, 125, 0.6);
+        }
+
+        /* Animated background elements */
+        .bubble-bg {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: floatUp 8s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        /* Custom scrollbar for leaderboard */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00b4db;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="w-screen h-screen relative ocean-gradient text-white flex flex-col justify-between overflow-hidden">
+
+    <div id="bubbleContainer" class="absolute inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+    <!-- MAIN MENU OVERLAY -->
+    <div id="startScreen" class="absolute inset-0 z-40 flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full p-8 rounded-3xl text-center flex flex-col items-center space-y-6 relative border border-cyan-400/30">
+            <!-- Animated Title Header -->
+            <div class="relative">
+                <i class="fa-solid font-fish text-cyan-400 text-5xl mb-2 animate-bounce"></i>
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-yellow-300 drop-shadow-md">
+                    FEEDING FRENZY
+                </h1>
+                <p class="text-cyan-200 text-sm font-semibold tracking-wider uppercase mt-1">Edisi Ekosistem Laut & Ekologi</p>
+            </div>
+
+            <!-- Student Name Input Box -->
+            <div class="w-full text-left space-y-2">
+                <label for="playerName" class="block text-xs uppercase tracking-wider text-cyan-300 font-bold">
+                    <i class="fa-solid fa-user-graduate mr-1"></i> Nama Siswa / Pemain:
+                </label>
+                <input type="text" id="playerName" placeholder="Masukkan nama lengkap kamu..." 
+                    class="w-full px-4 py-3 bg-slate-900/80 border border-cyan-500/40 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 font-sans text-base transition">
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="w-full space-y-3 pt-2">
+                <button id="btnPlay" class="btn-primary w-full py-4 rounded-xl font-bold text-lg text-white uppercase tracking-wide flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-play"></i>
+                    <span>Mulai Petualangan</span>
+                </button>
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="btnLeaderboard" class="bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600/50 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-trophy text-yellow-400"></i>
+                        <span>Papan Nilai</span>
+                    </button>
+                    <button id="btnHowToPlay" class="bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600/50 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-circle-info text-cyan-400"></i>
+                        <span>Cara Bermain</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer info -->
+            <p class="text-xs text-slate-400 pt-2">
+                Pelajari rantai makanan & bertahan hiduplah di kedalaman samudra!
+            </p>
+        </div>
+    </div>
+
+    <!-- GAME HUD OVERLAY (In Game) -->
+    <div id="gameHud" class="absolute top-0 left-0 right-0 z-30 p-4 flex justify-between items-center pointer-events-none hidden">
+        <!-- Player Info & Growth Bar -->
+        <div class="glass-card px-5 py-3 rounded-2xl flex items-center space-x-4 border border-cyan-400/30 pointer-events-auto">
+            <div class="flex flex-col">
+                <span id="hudPlayerName" class="text-xs font-bold text-cyan-300">Siswa</span>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs text-slate-300">Level Ikan:</span>
+                    <span id="hudLevelText" class="text-sm font-extrabold text-yellow-300">Ikan Kecil</span>
+                </div>
+            </div>
+            <!-- Growth Bar Container -->
+            <div class="w-32 md:w-48 bg-slate-800 h-4 rounded-full overflow-hidden border border-slate-600 relative">
+                <div id="growthBar" class="bg-gradient-to-r from-teal-400 to-yellow-400 h-full w-0 transition-all duration-300"></div>
+                <span class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white drop-shadow">
+                    <span id="growthText">0 / 100</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Score & Life Lives Counter -->
+        <div class="flex items-center space-x-3 pointer-events-auto">
+            <!-- Lives / Revives -->
+            <div class="glass-card px-4 py-2 rounded-2xl flex items-center space-x-2 border border-red-400/30">
+                <i class="fa-solid fa-heart text-red-500 text-lg animate-pulse"></i>
+                <span id="hudLives" class="text-lg font-extrabold text-white">3/3</span>
+                <span class="text-xs text-slate-300 hidden md:inline">(Kesempatan Quiz)</span>
+            </div>
+
+            <!-- Score -->
+            <div class="glass-card px-5 py-2 rounded-2xl flex items-center space-x-3 border border-yellow-400/30">
+                <i class="fa-solid fa-star text-yellow-400 text-xl"></i>
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-slate-300 uppercase font-bold tracking-wider">Skor</span>
+                    <span id="hudScore" class="text-xl font-extrabold text-yellow-300">0</span>
+                </div>
+            </div>
+
+            <!-- Sound Toggle -->
+            <button id="btnSoundToggle" class="glass-card w-11 h-11 rounded-2xl flex items-center justify-center border border-slate-500/30 hover:bg-slate-700/50 transition">
+                <i id="soundIcon" class="fa-solid fa-volume-high text-cyan-300"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- CANVAS CONTAINER -->
+    <div id="canvasContainer" class="relative w-full h-full z-10">
+        <canvas id="gameCanvas" class="w-full h-full block cursor-none"></canvas>
+    </div>
+
+    <!-- ECOLOGY QUIZ MODAL (Triggered when eaten by larger fish) -->
+    <div id="quizModal" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+        <div class="glass-card max-w-2xl w-full p-6 md:p-8 rounded-3xl border border-yellow-400/50 shadow-2xl space-y-6">
+            <!-- Header Alert -->
+            <div class="flex items-center space-x-4 border-b border-slate-700/80 pb-4">
+                <div class="w-12 h-12 rounded-2xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400 text-2xl shrink-0">
+                    <i class="fa-solid fa-fish-fins"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-red-400">Ikanmu Dimakan Musuh!</h2>
+                    <p class="text-xs text-slate-300">Jawab pertanyaan ekologi laut dengan benar untuk kesempatan *RESPAWN* (Sisa: <span id="quizLivesLeft" class="font-bold text-yellow-300">3</span>x)!</p>
+                </div>
+            </div>
+
+            <!-- Question Text -->
+            <div class="bg-slate-900/90 p-4 md:p-5 rounded-2xl border border-slate-700">
+                <span class="inline-block px-3 py-1 bg-cyan-900/60 text-cyan-300 text-xs font-bold rounded-full mb-2">
+                    <i class="fa-solid fa-book-open mr-1"></i> Pertanyaan Ekologi Dasar
+                </span>
+                <p id="quizQuestion" class="text-base md:text-lg font-medium text-white leading-relaxed">
+                    Loading soal...
+                </p>
+            </div>
+
+            <!-- 5 Multiple Choice Options (A, B, C, D, E) -->
+            <div id="quizOptions" class="grid grid-cols-1 gap-2.5">
+                <!-- Dynamically populated options -->
+            </div>
+
+            <!-- Result Feedback Notification -->
+            <div id="quizFeedback" class="hidden p-3 rounded-xl text-center text-sm font-bold"></div>
+        </div>
+    </div>
+
+    <!-- LEADERBOARD MODAL -->
+    <div id="leaderboardModal" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+        <div class="glass-card max-w-2xl w-full p-6 md:p-8 rounded-3xl border border-cyan-400/40 flex flex-col max-h-[90vh]">
+            <!-- Header -->
+            <div class="flex justify-between items-center pb-4 border-b border-slate-700">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-trophy text-yellow-400 text-3xl"></i>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Papan Nilai Siswa</h2>
+                        <p class="text-xs text-cyan-300">Peringkat skor Feeding Frenzy Laut</p>
+                    </div>
+                </div>
+                <button id="btnCloseLeaderboard" class="w-9 h-9 bg-slate-800 hover:bg-slate-700 rounded-full flex items-center justify-center text-slate-300 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Table content -->
+            <div class="overflow-y-auto flex-1 my-4 pr-1">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="text-xs uppercase bg-slate-900/80 text-cyan-300 sticky top-0">
+                        <tr>
+                            <th class="py-3 px-3 rounded-l-lg">#</th>
+                            <th class="py-3 px-3">Nama Siswa</th>
+                            <th class="py-3 px-3 text-center">Skor</th>
+                            <th class="py-3 px-3 text-center">Tingkat Ikan</th>
+                            <th class="py-3 px-3 text-center rounded-r-lg">Quiz Benar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardTableBody" class="divide-y divide-slate-800">
+                        <!-- Dynamic rows -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer Controls (Download CSV Gsheet Token Protected) -->
+            <div class="pt-4 border-t border-slate-700 flex flex-col md:flex-row justify-between items-center gap-3">
+                <span class="text-xs text-slate-400">Diperlukan Token Khusus Guru untuk mengunduh rekap CSV/Gsheet.</span>
+                <button id="btnDownloadLeaderboard" class="btn-success px-5 py-2.5 rounded-xl font-bold text-sm text-slate-900 flex items-center space-x-2">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>Unduh Hasil Nilai (Gsheet)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECURITY TOKEN MODAL FOR GSHEET DOWNLOAD -->
+    <div id="tokenModal" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden">
+        <div class="glass-card max-w-sm w-full p-6 rounded-3xl border border-cyan-400/50 space-y-4 text-center">
+            <div class="w-12 h-12 bg-cyan-500/20 border border-cyan-400/40 rounded-2xl mx-auto flex items-center justify-center text-cyan-300 text-xl">
+                <i class="fa-solid fa-key"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">Akses Guru / Pengawas</h3>
+            <p class="text-xs text-slate-300">Masukkan Token Rahasia (1234) untuk mendownload file CSV rekap nilai siswa:</p>
+            
+            <input type="password" id="inputToken" maxlength="10" placeholder="Masukkan token..." 
+                class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-center text-xl tracking-widest text-cyan-300 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+            
+            <p id="tokenErrorMsg" class="text-xs text-red-400 font-bold hidden">Token salah! Gunakan token "1234".</p>
+
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button id="btnCancelToken" class="bg-slate-800 hover:bg-slate-700 py-2.5 rounded-xl text-xs font-semibold">Batal</button>
+                <button id="btnConfirmToken" class="btn-primary py-2.5 rounded-xl text-xs font-bold">Verifikasi & Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME OVER / FINAL RESULT MODAL -->
+    <div id="gameOverModal" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden">
+        <div class="glass-card max-w-md w-full p-8 rounded-3xl border border-red-500/40 text-center space-y-6">
+            <div class="relative">
+                <i class="fa-solid fa-skull-crossbones text-red-400 text-5xl animate-pulse"></i>
+                <h2 class="text-3xl font-extrabold text-white mt-2">PERMAINAN SELESAI</h2>
+                <p class="text-xs text-slate-300">Kesempatan jawaban quiz telah habis!</p>
+            </div>
+
+            <div class="bg-slate-900/90 p-4 rounded-2xl border border-slate-800 space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400">Pemain:</span>
+                    <span id="finalPlayerName" class="font-bold text-cyan-300">Siswa</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400">Skor Akhir:</span>
+                    <span id="finalScore" class="font-extrabold text-yellow-300 text-lg">0</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400">Tingkat Pertumbuhan:</span>
+                    <span id="finalStage" class="font-semibold text-teal-300">Ikan Kecil</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400">Quiz Ekologi Terjawab Benar:</span>
+                    <span id="finalQuizCorrect" class="font-bold text-green-400">0</span>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <button id="btnRestartGame" class="btn-primary w-full py-3.5 rounded-xl font-bold text-base uppercase tracking-wide">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> Main Lagi
+                </button>
+                <button id="btnGameOverLeaderboard" class="w-full bg-slate-800 hover:bg-slate-700 py-3 rounded-xl font-semibold text-sm">
+                    <i class="fa-solid fa-trophy text-yellow-400 mr-2"></i> Lihat Papan Nilai
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOW TO PLAY MODAL -->
+    <div id="howToPlayModal" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+        <div class="glass-card max-w-lg w-full p-6 md:p-8 rounded-3xl border border-cyan-400/40 space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="text-xl font-bold text-cyan-300"><i class="fa-solid fa-gamepad mr-2"></i> Cara Bermain</h3>
+                <button id="btnCloseHowTo" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <ul class="space-y-3 text-xs md:text-sm text-slate-200">
+                <li class="flex items-start space-x-3">
+                    <span class="bg-cyan-500/20 text-cyan-300 w-6 h-6 rounded-full flex items-center justify-center font-bold shrink-0">1</span>
+                    <span>Gerakkan kursor <b>Mouse / Sentuhan Touchscreen</b> untuk mengarahkan renang ikan kamu.</span>
+                </li>
+                <li class="flex items-start space-x-3">
+                    <span class="bg-cyan-500/20 text-cyan-300 w-6 h-6 rounded-full flex items-center justify-center font-bold shrink-0">2</span>
+                    <span>Makan ikan yang berukuran <b>LEBIH KECIL</b> dari ikanmu untuk menambah ukuran & skor.</span>
+                </li>
+                <li class="flex items-start space-x-3">
+                    <span class="bg-cyan-500/20 text-cyan-300 w-6 h-6 rounded-full flex items-center justify-center font-bold shrink-0">3</span>
+                    <span>Hindari ikan yang berukuran <b>LEBIH BESAR</b> karena mereka akan memakanmu!</span>
+                </li>
+                <li class="flex items-start space-x-3">
+                    <span class="bg-cyan-500/20 text-cyan-300 w-6 h-6 rounded-full flex items-center justify-center font-bold shrink-0">4</span>
+                    <span>Jika dimakan, kamu harus menjawab soal <b>Pilihan Ganda Ekologi Dasar (5 pilihan)</b> untuk melanjutkan permainan (Maksimal 3 kali kesempatan).</span>
+                </li>
+            </ul>
+            <button id="btnGotIt" class="btn-primary w-full py-3 rounded-xl font-bold text-sm">Mengerti!</button>
+        </div>
+    </div>
+
+    <script>
+        // SOUND ENGINE (Web Audio API for sound effects)
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+            }
+
+            playEat() {
+                if (this.muted || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(250, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.1);
+            }
+
+            playLevelUp() {
+                if (this.muted || !this.ctx) return;
+                const notes = [261.63, 329.63, 392.00, 523.25];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.08);
+                    gain.gain.setValueAtTime(0.2, this.ctx.currentTime + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + idx * 0.08 + 0.15);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + idx * 0.08);
+                    osc.stop(this.ctx.currentTime + idx * 0.08 + 0.15);
+                });
+            }
+
+            playHurt() {
+                if (this.muted || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(60, this.ctx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.3);
+            }
+
+            playCorrect() {
+                if (this.muted || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, this.ctx.currentTime + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, this.ctx.currentTime + 0.2); // G5
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.4);
+            }
+
+            playWrong() {
+                if (this.muted || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(120, this.ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.35);
+            }
+        }
+
+        const sound = new SoundEngine();
+
+        // ECOLOGY QUESTION BANK (5 Options Each)
+        const ecologyQuestions = [
+            {
+                q: "Di bawah ini yang merupakan komponen ABIOTIK dalam ekosistem laut adalah...",
+                options: [
+                    "Terumbu karang dan rumput laut",
+                    "Kadar garam (salinitas), suhu, dan air laut",
+                    "Fitoplankton dan zooplankton",
+                    "Bakteri pengurai dan jamur laut",
+                    "Ikan hiu dan ikan remora"
+                ],
+                answer: 1
+            },
+            {
+                q: "Organisme yang berperan sebagai PRODUSEN UTAMA di ekosistem perairan laut adalah...",
+                options: [
+                    "Zooplankton",
+                    "Ikan-ikan kecil",
+                    "Fitoplankton",
+                    "Bintang laut",
+                    "Bakteri dekomposer"
+                ],
+                answer: 2
+            },
+            {
+                q: "Hubungan simbiotis antara ikan remora yang menempel pada tubuh ikan hiu dinamakan...",
+                options: [
+                    "Parasitisme",
+                    "Mutualisme",
+                    "Komensalisme",
+                    "Predasi",
+                    "Kompetisi"
+                ],
+                answer: 2
+            },
+            {
+                q: "Urutan rantai makanan di laut yang tepat dari tingkat trofik terkecil hingga terbesar adalah...",
+                options: [
+                    "Fitoplankton → Zooplankton → Ikan Kecil → Ikan Besar",
+                    "Zooplankton → Fitoplankton → Ikan Besar → Ikan Kecil",
+                    "Ikan Kecil → Fitoplankton → Zooplankton → Hiu",
+                    "Fitoplankton → Ikan Besar → Zooplankton → Bakteri",
+                    "Pengurai → Zooplankton → Fitoplankton → Ikan Kecil"
+                ],
+                answer: 0
+            },
+            {
+                q: "Proses perpindahan energi dari satu tingkat trofik ke tingkat trofik berikutnya di dalam ekosistem dinamakan...",
+                options: [
+                    "Piramida Biomassa",
+                    "Daur Biogeokimia",
+                    "Aliran Energi",
+                    "Suksesi Ekologi",
+                    "Eutrofikasi"
+                ],
+                answer: 2
+            },
+            {
+                q: "Peran utama dekomposer (pengurai) di dalam ekosistem laut adalah...",
+                options: [
+                    "Menghasilkan oksigen melalui fotosintesis",
+                    "Memangsa konsumen puncak untuk mengontrol populasi",
+                    "Menguraikan sisa organisme mati menjadi nutrisi anorganik",
+                    "Menyerap radiasi matahari langsung di dasar laut",
+                    "Menyediakan tempat berlindung bagi juvenil ikan"
+                ],
+                answer: 2
+            },
+            {
+                q: "Fenomena ledakan alga (algal bloom) akibat pembuangan limbah fosfat/pupuk berlebih ke perairan dinamakan...",
+                options: [
+                    "Salinisasi",
+                    "Eutrofikasi",
+                    "Bioakumulasi",
+                    "Magnifikasi Biologi",
+                    "Acidifikasi Laut"
+                ],
+                answer: 1
+            },
+            {
+                q: "Organisme yang memakan tumbuhan atau mikroalga secara langsung menduduki tingkat trofik...",
+                options: [
+                    "Produsen",
+                    "Konsumen Primer (Konsumen I)",
+                    "Konsumen Sekunder (Konsumen II)",
+                    "Konsumen Tersier (Konsumen III)",
+                    "Dekomposer"
+                ],
+                answer: 1
+            },
+            {
+                q: "Konsumen puncak (Top Predator) di jaring-jaring makanan samudra lepas umumnya diwakili oleh...",
+                options: [
+                    "Udang rebon",
+                    "Ikan Kakap Merah",
+                    "Ikan Hiu / Paus Pembunuh",
+                    "Ubur-ubur",
+                    "Kepiting Bakau"
+                ],
+                answer: 2
+            },
+            {
+                q: "Adaptasi morfologi ikan laut untuk mengurangi hambatan saat berenang cepat adalah bentuk tubuh...",
+                options: [
+                    "Gepeng lebar (pipih)",
+                    "Torpedo / Streamline",
+                    "Bulat membal",
+                    "Panjang menyerupai cacing",
+                    "Kotak kaku"
+                ],
+                answer: 1
+            }
+        ];
+
+        // FISH SPECIES CONFIGURATION FOR VISUAL VARIETY (Feeding Frenzy style)
+        const SPECIES_CONFIG = [
+            {
+                type: 'guppy',
+                name: 'Ikan Guppy Laut',
+                minSize: 12,
+                maxSize: 18,
+                bodyColor: '#ff6b6b',
+                finColor: '#ffd166',
+                speed: 2.8,
+                tier: 1
+            },
+            {
+                type: 'clownfish',
+                name: 'Ikan Badut (Nemo)',
+                minSize: 22,
+                maxSize: 32,
+                bodyColor: '#ff8000',
+                stripeColor: '#ffffff',
+                finColor: '#e05300',
+                speed: 2.2,
+                tier: 1
+            },
+            {
+                type: 'tang',
+                name: 'Ikan Tang Biru (Dory)',
+                minSize: 38,
+                maxSize: 52,
+                bodyColor: '#0077b6',
+                finColor: '#ffd166',
+                speed: 2.0,
+                tier: 2
+            },
+            {
+                type: 'snapper',
+                name: 'Ikan Kakap Merah',
+                minSize: 60,
+                maxSize: 82,
+                bodyColor: '#e63946',
+                finColor: '#9b2226',
+                speed: 1.7,
+                tier: 3
+            },
+            {
+                type: 'shark',
+                name: 'Hiu Karang',
+                minSize: 95,
+                maxSize: 130,
+                bodyColor: '#4a5568',
+                bellyColor: '#cbd5e0',
+                finColor: '#2d3748',
+                speed: 1.4,
+                tier: 4
+            }
+        ];
+
+        class Game {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.playerName = 'Siswa';
+                this.score = 0;
+                this.growth = 0;
+                this.maxGrowth = 100;
+                this.tier = 1; // 1: Small, 2: Medium, 3: Large, 4: Giant Apex
+                this.lives = 3;
+                this.quizCorrectCount = 0;
+                this.isRunning = false;
+                this.isPaused = false;
+                
+                this.player = null;
+                this.fishes = [];
+                this.floatingTexts = [];
+                this.bgBubbles = [];
+
+                this.corals = [];
+                this.kelpForest = [];
+                this.seabedStarfish = [];
+                this.bgCreatures = [];
+
+                this.mouseX = 0;
+                this.mouseY = 0;
+                this.lastSpawnTime = 0;
+                this.currentQuestion = null;
+
+                this.initResize();
+                this.initEcosystemEnvironment();
+                this.initEventListeners();
+                this.generateBgBubbles();
+            }
+
+            initEcosystemEnvironment() {
+                // Generate kelp plants with wave physics offsets
+                this.kelpForest = [];
+                const kelpCount = Math.floor(window.innerWidth / 45) + 4;
+                for (let i = 0; i < kelpCount; i++) {
+                    this.kelpForest.push({
+                        x: i * 42 + (Math.random() * 20 - 10),
+                        height: 150 + Math.random() * 170,
+                        width: 14 + Math.random() * 10,
+                        phaseOffset: Math.random() * Math.PI * 2,
+                        color: Math.random() < 0.5 ? '#117a42' : '#0d5c3a'
+                    });
+                }
+
+                // Generate Coral Reef structures at bottom
+                this.corals = [];
+                const coralColors = ['#e76f51', '#f4a261', '#e9c46a', '#ee6c4d', '#3a86ff', '#8338ec', '#ff006e'];
+                for (let x = 20; x < window.innerWidth + 50; x += 80 + Math.random() * 60) {
+                    this.corals.push({
+                        x: x,
+                        type: ['brain', 'branching', 'anemone', 'table'][Math.floor(Math.random() * 4)],
+                        size: 45 + Math.random() * 45,
+                        color: coralColors[Math.floor(Math.random() * coralColors.length)],
+                        phase: Math.random() * Math.PI
+                    });
+                }
+
+                // Generate Starfishes on seabed
+                this.seabedStarfish = [];
+                for (let i = 0; i < 9; i++) {
+                    this.seabedStarfish.push({
+                        x: Math.random() * window.innerWidth,
+                        yOffset: Math.random() * 12,
+                        size: 10 + Math.random() * 12,
+                        color: Math.random() < 0.5 ? '#ff4757' : '#ffa502',
+                        rotation: Math.random() * Math.PI
+                    });
+                }
+
+                // Distant background silhouettes (Parallax Whale / Manta Ray)
+                this.bgCreatures = [
+                    { x: -150, y: window.innerHeight * 0.35, vx: 0.35, type: 'manta', size: 85 },
+                    { x: window.innerWidth + 250, y: window.innerHeight * 0.22, vx: -0.2, type: 'whale', size: 170 }
+                ];
+            }
+
+            initResize() {
+                this.resize = () => {
+                    this.canvas.width = window.innerWidth;
+                    this.canvas.height = window.innerHeight;
+                    this.initEcosystemEnvironment();
+                };
+                this.resize();
+                window.addEventListener('resize', this.resize);
+            }
+
+            generateBgBubbles() {
+                this.bgBubbles = [];
+                for (let i = 0; i < 45; i++) {
+                    this.bgBubbles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        radius: Math.random() * 4 + 1,
+                        speed: Math.random() * 1.4 + 0.4,
+                        alpha: Math.random() * 0.45 + 0.15
+                    });
+                }
+            }
+
+            start(playerName) {
+                this.playerName = playerName || 'Siswa';
+                this.score = 0;
+                this.growth = 0;
+                this.tier = 1;
+                this.lives = 3;
+                this.quizCorrectCount = 0;
+                this.fishes = [];
+                this.floatingTexts = [];
+                
+                // Initialize player fish
+                this.player = {
+                    x: this.canvas.width / 2,
+                    y: this.canvas.height / 2,
+                    radius: 16, // Size
+                    angle: 0,
+                    facingRight: true,
+                    mouthOpen: 0,
+                    invulnerableTimer: 0,
+                    swimCycle: 0
+                };
+
+                this.mouseX = this.player.x;
+                this.mouseY = this.player.y;
+
+                this.isRunning = true;
+                this.isPaused = false;
+                
+                // Update HUD
+                document.getElementById('hudPlayerName').innerText = this.playerName;
+                this.updateHud();
+
+                // Spawn initial fishes
+                for(let i = 0; i < 12; i++) {
+                    this.spawnFish(true);
+                }
+
+                // Start game loop
+                requestAnimationFrame((timestamp) => this.gameLoop(timestamp));
+            }
+
+            initEventListeners() {
+                // Mouse tracking
+                window.addEventListener('mousemove', (e) => {
+                    this.mouseX = e.clientX;
+                    this.mouseY = e.clientY;
+                });
+
+                // Touch tracking for mobile
+                window.addEventListener('touchmove', (e) => {
+                    if (e.touches.length > 0) {
+                        this.mouseX = e.touches[0].clientX;
+                        this.mouseY = e.touches[0].clientY;
+                    }
+                }, { passive: true });
+            }
+
+            spawnFish(initial = false) {
+                // Pick species based on current player tier to ensure eating targets exist
+                let speciesIndex;
+                const rand = Math.random();
+
+                if (this.tier === 1) {
+                    speciesIndex = rand < 0.65 ? 0 : (rand < 0.9 ? 1 : 2);
+                } else if (this.tier === 2) {
+                    speciesIndex = rand < 0.35 ? 0 : (rand < 0.7 ? 1 : (rand < 0.9 ? 2 : 3));
+                } else if (this.tier === 3) {
+                    speciesIndex = rand < 0.2 ? 0 : (rand < 0.45 ? 1 : (rand < 0.75 ? 2 : 4));
+                } else {
+                    speciesIndex = Math.floor(Math.random() * SPECIES_CONFIG.length);
+                }
+
+                const config = SPECIES_CONFIG[speciesIndex];
+                const radius = config.minSize + Math.random() * (config.maxSize - config.minSize);
+                
+                // Spawn position
+                const fromLeft = Math.random() < 0.5;
+                const x = initial 
+                    ? Math.random() * this.canvas.width 
+                    : (fromLeft ? -radius * 2 : this.canvas.width + radius * 2);
+                const y = Math.random() * (this.canvas.height - 120) + 60;
+                const vx = (fromLeft ? 1 : -1) * (config.speed + Math.random() * 0.8);
+                
+                this.fishes.push({
+                    x: x,
+                    y: y,
+                    vx: vx,
+                    vy: Math.sin(x * 0.01) * 0.5,
+                    radius: radius,
+                    config: config,
+                    facingRight: vx > 0,
+                    swimCycle: Math.random() * 100
+                });
+            }
+
+            drawFish(ctx, x, y, radius, facingRight, config, swimCycle, mouthAngle = 0, isPlayer = false) {
+                ctx.save();
+                ctx.translate(x, y);
+                
+                // Direction flip
+                if (!facingRight) {
+                    ctx.scale(-1, 1);
+                }
+
+                const tailWiggle = Math.sin(swimCycle * 0.2) * (radius * 0.25);
+
+                // 1. Tail Fin
+                ctx.fillStyle = config.finColor || '#ff8000';
+                ctx.beginPath();
+                ctx.moveTo(-radius * 0.8, 0);
+                ctx.lineTo(-radius * 1.5, -radius * 0.6 + tailWiggle);
+                ctx.lineTo(-radius * 1.3, 0 + tailWiggle);
+                ctx.lineTo(-radius * 1.5, radius * 0.6 + tailWiggle);
+                ctx.closePath();
+                ctx.fill();
+
+                // 2. Dorsal Fin (Top)
+                ctx.beginPath();
+                ctx.moveTo(-radius * 0.2, -radius * 0.7);
+                ctx.quadraticCurveTo(radius * 0.2, -radius * 1.2, radius * 0.5, -radius * 0.4);
+                ctx.lineTo(-radius * 0.4, -radius * 0.5);
+                ctx.closePath();
+                ctx.fill();
+
+                // 3. Main Body Body (Ellipse/Path)
+                ctx.fillStyle = config.bodyColor || '#333';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, radius * 1.1, radius * 0.75, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Belly / Stripes accents for specific types
+                if (config.type === 'clownfish') {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(-radius * 0.2, -radius * 0.65, radius * 0.25, radius * 1.3);
+                    ctx.fillRect(radius * 0.3, -radius * 0.5, radius * 0.2, radius * 1.0);
+                } else if (config.type === 'shark') {
+                    ctx.fillStyle = config.bellyColor || '#fff';
+                    ctx.beginPath();
+                    ctx.ellipse(0, radius * 0.2, radius * 0.9, radius * 0.4, 0, 0, Math.PI);
+                    ctx.fill();
+                }
+
+                // 4. Eye
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(radius * 0.5, -radius * 0.2, Math.max(3, radius * 0.22), 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#000000';
+                ctx.beginPath();
+                ctx.arc(radius * 0.55, -radius * 0.2, Math.max(1.5, radius * 0.11), 0, Math.PI * 2);
+                ctx.fill();
+
+                // Highlight shine in eye
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(radius * 0.58, -radius * 0.26, Math.max(0.8, radius * 0.05), 0, Math.PI * 2);
+                ctx.fill();
+
+                // 5. Mouth (Opening Animation when eating)
+                if (mouthAngle > 0) {
+                    ctx.fillStyle = '#0a1d37';
+                    ctx.beginPath();
+                    ctx.moveTo(radius * 0.9, -radius * 0.1);
+                    ctx.lineTo(radius * 1.15, -radius * (0.1 + mouthAngle));
+                    ctx.lineTo(radius * 1.15, radius * (0.1 + mouthAngle));
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                // Highlight border if player
+                if (isPlayer) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, radius * 1.15, radius * 0.8, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+            }
+
+            update(timestamp) {
+                if (this.isPaused) return;
+
+                // Move ambient bubbles
+                this.bgBubbles.forEach(b => {
+                    b.y -= b.speed;
+                    if (b.y < -10) {
+                        b.y = this.canvas.height + 10;
+                        b.x = Math.random() * this.canvas.width;
+                    }
+                });
+
+                // Update Player Position towards Mouse smoothly
+                const dx = this.mouseX - this.player.x;
+                const dy = this.mouseY - this.player.y;
+                const dist = Math.hypot(dx, dy);
+
+                if (dist > 5) {
+                    this.player.x += dx * 0.12;
+                    this.player.y += dy * 0.12;
+                    if (Math.abs(dx) > 2) {
+                        this.player.facingRight = dx > 0;
+                    }
+                }
+                this.player.swimCycle += 1;
+                if (this.player.mouthOpen > 0) this.player.mouthOpen -= 0.05;
+                if (this.player.invulnerableTimer > 0) this.player.invulnerableTimer--;
+
+                // Player config based on tier
+                const playerConfig = {
+                    bodyColor: this.tier === 1 ? '#00f2fe' : (this.tier === 2 ? '#4facfe' : (this.tier === 3 ? '#ff0844' : '#f6d365')),
+                    finColor: '#ffb199',
+                    type: 'player'
+                };
+
+                // Spawn new enemy fishes
+                if (timestamp - this.lastSpawnTime > 1200 && this.fishes.length < 18) {
+                    this.spawnFish();
+                    this.lastSpawnTime = timestamp;
+                }
+
+                // Update Enemy Fishes
+                for (let i = this.fishes.length - 1; i >= 0; i--) {
+                    const fish = this.fishes[i];
+                    fish.x += fish.vx;
+                    fish.y += Math.sin(fish.x * 0.02) * 0.8;
+                    fish.swimCycle += 1;
+
+                    // Remove offscreen
+                    if ((fish.vx > 0 && fish.x > this.canvas.width + 100) || 
+                        (fish.vx < 0 && fish.x < -100)) {
+                        this.fishes.splice(i, 1);
+                        continue;
+                    }
+
+                    // Collision check with Player
+                    const pDist = Math.hypot(this.player.x - fish.x, this.player.y - fish.y);
+                    const eatDistance = (this.player.radius + fish.radius) * 0.75;
+
+                    if (pDist < eatDistance) {
+                        // PLAYER EATS SMALLER FISH
+                        if (this.player.radius >= fish.radius * 0.95) {
+                            sound.playEat();
+                            this.player.mouthOpen = 0.4;
+                            
+                            // Add Score & Growth
+                            const gainedScore = Math.round(fish.radius * 10);
+                            this.score += gainedScore;
+                            this.growth += fish.radius * 0.6;
+
+                            // Create Floating +Score Text
+                            this.floatingTexts.push({
+                                text: `+${gainedScore}`,
+                                x: fish.x,
+                                y: fish.y,
+                                opacity: 1.0,
+                                vy: -1.5
+                            });
+
+                            // Check Growth Level Up
+                            this.checkGrowth();
+
+                            this.fishes.splice(i, 1);
+                        } 
+                        // ENEMY EATS PLAYER (If invulnerability frame is off)
+                        else if (this.player.invulnerableTimer <= 0) {
+                            sound.playHurt();
+                            this.triggerQuizModal();
+                            return;
+                        }
+                    }
+                }
+
+                // Update Floating Texts
+                for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+                    const ft = this.floatingTexts[i];
+                    ft.y += ft.vy;
+                    ft.opacity -= 0.02;
+                    if (ft.opacity <= 0) {
+                        this.floatingTexts.splice(i, 1);
+                    }
+                }
+
+                this.updateHud();
+            }
+
+            checkGrowth() {
+                if (this.growth >= this.maxGrowth) {
+                    if (this.tier < 4) {
+                        this.tier++;
+                        this.growth = 0;
+                        this.player.radius += 10;
+                        sound.playLevelUp();
+
+                        let stageName = "Ikan Sedang";
+                        if (this.tier === 3) stageName = "Ikan Besar Predator";
+                        if (this.tier === 4) stageName = "Raja Samudra / Hiu";
+
+                        this.floatingTexts.push({
+                            text: `LEVEL UP! (${stageName})`,
+                            x: this.player.x,
+                            y: this.player.y - 30,
+                            opacity: 1.0,
+                            vy: -2
+                        });
+                    } else {
+                        // Max Tier capped
+                        this.growth = this.maxGrowth;
+                    }
+                }
+            }
+
+            updateHud() {
+                document.getElementById('hudScore').innerText = this.score;
+                document.getElementById('hudLives').innerText = `${this.lives}/3`;
+                
+                const growthPercent = Math.min(100, Math.round((this.growth / this.maxGrowth) * 100));
+                document.getElementById('growthBar').style.width = `${growthPercent}%`;
+                document.getElementById('growthText').innerText = `${growthPercent}%`;
+
+                let levelLabel = "Ikan Kecil (Guppy)";
+                if (this.tier === 2) levelLabel = "Ikan Sedang (Tang)";
+                if (this.tier === 3) levelLabel = "Ikan Besar (Kakap)";
+                if (this.tier === 4) levelLabel = "Apex Predator (Hiu)";
+                document.getElementById('hudLevelText').innerText = levelLabel;
+            }
+
+            render() {
+                // Clear Canvas
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                const now = Date.now();
+                const time = now * 0.0015;
+
+                // 1. Render Sunlight Rays at Top Surface
+                this.ctx.save();
+                for (let i = 0; i < 6; i++) {
+                    const alpha = 0.03 + Math.sin(time + i) * 0.015;
+                    const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height * 0.85);
+                    gradient.addColorStop(0, `rgba(180, 240, 255, ${alpha + 0.05})`);
+                    gradient.addColorStop(1, 'rgba(0, 30, 60, 0)');
+                    
+                    this.ctx.fillStyle = gradient;
+                    this.ctx.beginPath();
+                    const startX = (i * (this.canvas.width / 5)) - 40;
+                    this.ctx.moveTo(startX, 0);
+                    this.ctx.lineTo(startX + 120 + Math.sin(time + i) * 30, this.canvas.height);
+                    this.ctx.lineTo(startX + 40 + Math.sin(time + i) * 30, this.canvas.height);
+                    this.ctx.lineTo(startX - 60, 0);
+                    this.ctx.closePath();
+                    this.ctx.fill();
+                }
+                this.ctx.restore();
+
+                // 2. Render Far Background Creature Silhouettes (Manta Ray & Whale)
+                this.bgCreatures.forEach(creature => {
+                    creature.x += creature.vx;
+                    if (creature.vx > 0 && creature.x > this.canvas.width + 250) creature.x = -250;
+                    if (creature.vx < 0 && creature.x < -250) creature.x = this.canvas.width + 250;
+
+                    this.ctx.save();
+                    this.ctx.fillStyle = 'rgba(2, 25, 50, 0.45)';
+                    this.ctx.translate(creature.x, creature.y);
+                    if (creature.vx < 0) this.ctx.scale(-1, 1);
+
+                    if (creature.type === 'manta') {
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(0, 0);
+                        this.ctx.quadraticCurveTo(creature.size * 0.4, -creature.size * 0.3, creature.size * 0.8, -creature.size * 0.1);
+                        this.ctx.quadraticCurveTo(creature.size * 0.3, creature.size * 0.2, 0, creature.size * 0.1);
+                        this.ctx.quadraticCurveTo(-creature.size * 0.3, creature.size * 0.2, -creature.size * 0.8, -creature.size * 0.1);
+                        this.ctx.quadraticCurveTo(-creature.size * 0.4, -creature.size * 0.3, 0, 0);
+                        this.ctx.fill();
+                        // Tail
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(0, creature.size * 0.05);
+                        this.ctx.lineTo(-creature.size * 0.9, creature.size * 0.15);
+                        this.ctx.strokeStyle = 'rgba(2, 25, 50, 0.45)';
+                        this.ctx.lineWidth = 3;
+                        this.ctx.stroke();
+                    } else if (creature.type === 'whale') {
+                        this.ctx.beginPath();
+                        this.ctx.ellipse(0, 0, creature.size * 0.7, creature.size * 0.22, 0, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        // Tail fin
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(-creature.size * 0.65, 0);
+                        this.ctx.lineTo(-creature.size * 0.85, -creature.size * 0.2);
+                        this.ctx.lineTo(-creature.size * 0.8, 0);
+                        this.ctx.lineTo(-creature.size * 0.85, creature.size * 0.2);
+                        this.ctx.closePath();
+                        this.ctx.fill();
+                    }
+                    this.ctx.restore();
+                });
+
+                // 3. Render Seabed Terrain / Sand Layer
+                const seabedY = this.canvas.height - 25;
+                this.ctx.fillStyle = '#062038';
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, this.canvas.height);
+                for (let x = 0; x <= this.canvas.width; x += 40) {
+                    const y = seabedY - Math.sin(x * 0.01) * 8;
+                    this.ctx.lineTo(x, y);
+                }
+                this.ctx.lineTo(this.canvas.width, this.canvas.height);
+                this.ctx.closePath();
+                this.ctx.fill();
+
+                // 4. Render Starfishes & Shells on Seabed
+                this.seabedStarfish.forEach(star => {
+                    this.ctx.save();
+                    this.ctx.translate(star.x, seabedY - star.yOffset);
+                    this.ctx.rotate(star.rotation);
+                    this.ctx.fillStyle = star.color;
+                    this.ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        this.ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * star.size, -Math.sin((18 + i * 72) * Math.PI / 180) * star.size);
+                        this.ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * (star.size * 0.4), -Math.sin((54 + i * 72) * Math.PI / 180) * (star.size * 0.4));
+                    }
+                    this.ctx.closePath();
+                    this.ctx.fill();
+                    this.ctx.restore();
+                });
+
+                // 5. Render Coral Reefs (Brain, Branching, Anemones)
+                this.corals.forEach(coral => {
+                    this.ctx.save();
+                    this.ctx.translate(coral.x, seabedY - 5);
+                    
+                    if (coral.type === 'brain') {
+                        this.ctx.fillStyle = coral.color;
+                        this.ctx.beginPath();
+                        this.ctx.arc(0, -coral.size * 0.4, coral.size * 0.45, Math.PI, 0);
+                        this.ctx.fill();
+                    } else if (coral.type === 'anemone') {
+                        // Swaying Tentacles
+                        this.ctx.strokeStyle = coral.color;
+                        this.ctx.lineWidth = 4;
+                        this.ctx.lineCap = 'round';
+                        const count = 7;
+                        for (let t = -count/2; t <= count/2; t++) {
+                            const sway = Math.sin(time * 2 + coral.phase + t) * 8;
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(t * 5, 0);
+                            this.ctx.quadraticCurveTo(t * 6 + sway * 0.5, -coral.size * 0.5, t * 7 + sway, -coral.size * 0.8);
+                            this.ctx.stroke();
+                        }
+                    } else if (coral.type === 'branching') {
+                        this.ctx.strokeStyle = coral.color;
+                        this.ctx.lineWidth = 6;
+                        this.ctx.lineCap = 'round';
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(0, 0);
+                        this.ctx.lineTo(0, -coral.size * 0.7);
+                        this.ctx.lineTo(-coral.size * 0.25, -coral.size * 0.9);
+                        this.ctx.moveTo(0, -coral.size * 0.4);
+                        this.ctx.lineTo(coral.size * 0.3, -coral.size * 0.75);
+                        this.ctx.stroke();
+                    } else { // Table Coral
+                        this.ctx.fillStyle = coral.color;
+                        this.ctx.fillRect(-6, -coral.size * 0.6, 12, coral.size * 0.6);
+                        this.ctx.beginPath();
+                        this.ctx.ellipse(0, -coral.size * 0.6, coral.size * 0.6, coral.size * 0.15, 0, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    }
+                    this.ctx.restore();
+                });
+
+                // 6. Render Swaying Kelp / Seaweed Forest
+                this.kelpForest.forEach(kelp => {
+                    this.ctx.save();
+                    this.ctx.fillStyle = kelp.color;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(kelp.x, seabedY);
+
+                    const baseSway = Math.sin(time + kelp.phaseOffset) * 20;
+                    const tipX = kelp.x + baseSway;
+                    const tipY = seabedY - kelp.height;
+
+                    this.ctx.quadraticCurveTo(
+                        kelp.x + baseSway * 0.5, 
+                        seabedY - kelp.height * 0.5, 
+                        tipX, 
+                        tipY
+                    );
+                    this.ctx.quadraticCurveTo(
+                        kelp.x + kelp.width + baseSway * 0.5, 
+                        seabedY - kelp.height * 0.5, 
+                        kelp.x + kelp.width, 
+                        seabedY
+                    );
+                    this.ctx.closePath();
+                    this.ctx.fill();
+                    this.ctx.restore();
+                });
+
+                // 7. Render Ambient Floating Bubbles / Marine Particles
+                this.bgBubbles.forEach(b => {
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${b.alpha})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+                    this.ctx.fill();
+                });
+
+                // 8. Render Enemy Fishes
+                this.fishes.forEach(fish => {
+                    this.drawFish(
+                        this.ctx, fish.x, fish.y, fish.radius, 
+                        fish.facingRight, fish.config, fish.swimCycle
+                    );
+                });
+
+                // 9. Render Player Fish
+                if (this.player) {
+                    const playerConfig = {
+                        bodyColor: this.tier === 1 ? '#00f2fe' : (this.tier === 2 ? '#38ef7d' : (this.tier === 3 ? '#ff9a9e' : '#f6d365')),
+                        finColor: '#ff0844',
+                        type: 'player'
+                    };
+
+                    // Flash when invulnerable
+                    if (this.player.invulnerableTimer % 6 < 3) {
+                        this.drawFish(
+                            this.ctx, this.player.x, this.player.y, this.player.radius, 
+                            this.player.facingRight, playerConfig, this.player.swimCycle, 
+                            this.player.mouthOpen, true
+                        );
+                    }
+                }
+
+                // 10. Render Floating +Score / LevelUp Texts
+                this.floatingTexts.forEach(ft => {
+                    this.ctx.fillStyle = `rgba(255, 215, 0, ${ft.opacity})`;
+                    this.ctx.font = 'bold 18px Fredoka, sans-serif';
+                    this.ctx.shadowColor = 'black';
+                    this.ctx.shadowBlur = 4;
+                    this.ctx.fillText(ft.text, ft.x, ft.y);
+                    this.ctx.shadowBlur = 0;
+                });
+            }
+
+            gameLoop(timestamp) {
+                if (!this.isRunning) return;
+
+                this.update(timestamp);
+                this.render();
+
+                requestAnimationFrame((ts) => this.gameLoop(ts));
+            }
+
+            triggerQuizModal() {
+                this.isPaused = true;
+
+                if (this.lives <= 0) {
+                    this.gameOver();
+                    return;
+                }
+
+                document.getElementById('quizLivesLeft').innerText = this.lives;
+                document.getElementById('quizFeedback').classList.add('hidden');
+
+                // Pick random question
+                this.currentQuestion = ecologyQuestions[Math.floor(Math.random() * ecologyQuestions.length)];
+                
+                document.getElementById('quizQuestion').innerText = this.currentQuestion.q;
+
+                // Render 5 options
+                const optionsContainer = document.getElementById('quizOptions');
+                optionsContainer.innerHTML = '';
+
+                const prefixes = ['A', 'B', 'C', 'D', 'E'];
+                this.currentQuestion.options.forEach((optText, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left p-3.5 bg-slate-800/90 hover:bg-cyan-900/60 border border-slate-700 hover:border-cyan-400 rounded-xl transition flex items-start space-x-3 text-sm text-slate-200 font-medium";
+                    btn.innerHTML = `
+                        <span class="w-6 h-6 rounded-lg bg-slate-700 text-cyan-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">${prefixes[index]}</span>
+                        <span class="flex-1">${optText}</span>
+                    `;
+                    btn.onclick = () => this.submitAnswer(index);
+                    optionsContainer.appendChild(btn);
+                });
+
+                document.getElementById('quizModal').classList.remove('hidden');
+            }
+
+            submitAnswer(selectedIndex) {
+                const feedbackEl = document.getElementById('quizFeedback');
+                feedbackEl.classList.remove('hidden', 'bg-green-500/20', 'text-green-300', 'bg-red-500/20', 'text-red-300');
+
+                if (selectedIndex === this.currentQuestion.answer) {
+                    // CORRECT ANSWER
+                    sound.playCorrect();
+                    this.quizCorrectCount++;
+                    this.lives--;
+                    
+                    feedbackEl.classList.add('bg-green-500/20', 'text-green-300', 'border', 'border-green-500/40');
+                    feedbackEl.innerText = "JAWABAN BENAR! Kamu mendapatkan kesempatan hidup kembali!";
+
+                    setTimeout(() => {
+                        document.getElementById('quizModal').classList.add('hidden');
+                        // Respawn player safely
+                        this.player.x = this.canvas.width / 2;
+                        this.player.y = this.canvas.height / 2;
+                        this.player.invulnerableTimer = 120; // 2 seconds grace period
+                        this.isPaused = false;
+                    }, 1500);
+
+                } else {
+                    // INCORRECT ANSWER
+                    sound.playWrong();
+                    this.lives--;
+
+                    feedbackEl.classList.add('bg-red-500/20', 'text-red-300', 'border', 'border-red-500/40');
+                    feedbackEl.innerText = `JAWABAN SALAH! Jawaban yang benar: (${['A','B','C','D','E'][this.currentQuestion.answer]}) ${this.currentQuestion.options[this.currentQuestion.answer]}`;
+
+                    setTimeout(() => {
+                        document.getElementById('quizModal').classList.add('hidden');
+                        if (this.lives > 0) {
+                            // Give another chance or resume
+                            this.player.x = this.canvas.width / 2;
+                            this.player.y = this.canvas.height / 2;
+                            this.player.invulnerableTimer = 120;
+                            this.isPaused = false;
+                        } else {
+                            this.gameOver();
+                        }
+                    }, 2200);
+                }
+            }
+
+            gameOver() {
+                this.isRunning = false;
+                sound.playHurt();
+
+                // Save score to leaderboard
+                saveScoreToLeaderboard({
+                    name: this.playerName,
+                    score: this.score,
+                    tier: this.tier,
+                    quizCorrect: this.quizCorrectCount,
+                    date: new Date().toLocaleDateString('id-ID')
+                });
+
+                // Update Game Over Modal
+                document.getElementById('finalPlayerName').innerText = this.playerName;
+                document.getElementById('finalScore').innerText = this.score;
+                
+                let stageName = "Ikan Kecil";
+                if (this.tier === 2) stageName = "Ikan Sedang";
+                if (this.tier === 3) stageName = "Ikan Besar Predator";
+                if (this.tier === 4) stageName = "Apex Predator / Hiu";
+                document.getElementById('finalStage').innerText = stageName;
+                document.getElementById('finalQuizCorrect').innerText = `${this.quizCorrectCount} Soal`;
+
+                document.getElementById('gameOverModal').classList.remove('hidden');
+            }
+        }
+
+        // LEADERBOARD STORAGE SYSTEM (LocalStorage + CSV Export)
+        const LEADERBOARD_KEY = 'feeding_frenzy_ecology_scores';
+
+        function getLeaderboard() {
+            const data = localStorage.getItem(LEADERBOARD_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveScoreToLeaderboard(entry) {
+            const list = getLeaderboard();
+            list.push(entry);
+            // Sort high score first
+            list.sort((a, b) => b.score - a.score);
+            localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(list));
+        }
+
+        function renderLeaderboardTable() {
+            const list = getLeaderboard();
+            const tbody = document.getElementById('leaderboardTableBody');
+            tbody.innerHTML = '';
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Belum ada skor tercatat. Mainkan game sekarang!</td></tr>`;
+                return;
+            }
+
+            list.slice(0, 20).forEach((item, idx) => {
+                let stageLabel = "Kecil";
+                if (item.tier === 2) stageLabel = "Sedang";
+                if (item.tier === 3) stageLabel = "Besar";
+                if (item.tier === 4) stageLabel = "Apex Predator";
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/50 transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-bold ${idx === 0 ? 'text-yellow-400' : (idx === 1 ? 'text-slate-300' : (idx === 2 ? 'text-amber-600' : 'text-slate-500'))}">${idx + 1}</td>
+                    <td class="py-3 px-3 font-semibold text-white">${item.name}</td>
+                    <td class="py-3 px-3 text-center font-extrabold text-yellow-300">${item.score}</td>
+                    <td class="py-3 px-3 text-center text-xs text-teal-300">${stageLabel}</td>
+                    <td class="py-3 px-3 text-center font-bold text-green-400">${item.quizCorrect || 0}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // CSV / GSHEET EXPORT FUNCTION WITH SECURITY TOKEN '1234'
+        function exportToCSV() {
+            const list = getLeaderboard();
+            if (list.length === 0) {
+                alert('Belum ada data nilai untuk diunduh!');
+                return;
+            }
+
+            // Generate CSV content with UTF-8 BOM for Microsoft Excel / Google Sheets compatibility
+            let csvContent = "\uFEFF"; // UTF-8 BOM
+            csvContent += "No,Nama Siswa,Tanggal,Skor Akhir,Tingkat Pertumbuhan,Quiz Ekologi Benar\n";
+
+            list.forEach((item, index) => {
+                let stageLabel = "Ikan Kecil";
+                if (item.tier === 2) stageLabel = "Ikan Sedang";
+                if (item.tier === 3) stageLabel = "Ikan Besar Predator";
+                if (item.tier === 4) stageLabel = "Apex Predator (Hiu)";
+
+                const row = [
+                    index + 1,
+                    `"${item.name.replace(/"/g, '""')}"`,
+                    `"${item.date || '-'}"`,
+                    item.score,
+                    `"${stageLabel}"`,
+                    item.quizCorrect || 0
+                ].join(",");
+
+                csvContent += row + "\n";
+            });
+
+            // Trigger download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Rekap_Nilai_FeedingFrenzy_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // APP INITIALIZATION & UI EVENT HANDLERS
+        let currentGame = null;
+
+        window.onload = () => {
+            currentGame = new Game();
+
+            // Play Button
+            document.getElementById('btnPlay').onclick = () => {
+                const nameInput = document.getElementById('playerName').value.trim();
+                if (!nameInput) {
+                    alert('Harap masukkan nama siswa terlebih dahulu!');
+                    return;
+                }
+
+                sound.init();
+                document.getElementById('startScreen').classList.add('hidden');
+                document.getElementById('gameHud').classList.remove('hidden');
+
+                currentGame.start(nameInput);
+            };
+
+            // Sound Toggle Button
+            document.getElementById('btnSoundToggle').onclick = () => {
+                sound.muted = !sound.muted;
+                const icon = document.getElementById('soundIcon');
+                if (sound.muted) {
+                    icon.className = 'fa-solid fa-volume-xmark text-red-400';
+                } else {
+                    icon.className = 'fa-solid fa-volume-high text-cyan-300';
+                }
+            };
+
+            // Leaderboard Modal Open/Close
+            document.getElementById('btnLeaderboard').onclick = () => {
+                renderLeaderboardTable();
+                document.getElementById('leaderboardModal').classList.remove('hidden');
+            };
+
+            document.getElementById('btnCloseLeaderboard').onclick = () => {
+                document.getElementById('leaderboardModal').classList.add('hidden');
+            };
+
+            // How To Play Modal
+            document.getElementById('btnHowToPlay').onclick = () => {
+                document.getElementById('howToPlayModal').classList.remove('hidden');
+            };
+            document.getElementById('btnCloseHowTo').onclick = () => {
+                document.getElementById('howToPlayModal').classList.add('hidden');
+            };
+            document.getElementById('btnGotIt').onclick = () => {
+                document.getElementById('howToPlayModal').classList.add('hidden');
+            };
+
+            // Download CSV Gsheet Token Verification Modal
+            document.getElementById('btnDownloadLeaderboard').onclick = () => {
+                document.getElementById('inputToken').value = '';
+                document.getElementById('tokenErrorMsg').classList.add('hidden');
+                document.getElementById('tokenModal').classList.remove('hidden');
+            };
+
+            document.getElementById('btnCancelToken').onclick = () => {
+                document.getElementById('tokenModal').classList.add('hidden');
+            };
+
+            document.getElementById('btnConfirmToken').onclick = () => {
+                const tokenVal = document.getElementById('inputToken').value.trim();
+                if (tokenVal === '1234') {
+                    document.getElementById('tokenModal').classList.add('hidden');
+                    exportToCSV();
+                } else {
+                    document.getElementById('tokenErrorMsg').classList.remove('hidden');
+                }
+            };
+
+            // Restart Game from Game Over
+            document.getElementById('btnRestartGame').onclick = () => {
+                document.getElementById('gameOverModal').classList.add('hidden');
+                const name = document.getElementById('playerName').value.trim() || 'Siswa';
+                currentGame.start(name);
+            };
+
+            document.getElementById('btnGameOverLeaderboard').onclick = () => {
+                document.getElementById('gameOverModal').classList.add('hidden');
+                renderLeaderboardTable();
+                document.getElementById('leaderboardModal').classList.remove('hidden');
+            };
+        };
+    </script>
+</body>
+</html>
