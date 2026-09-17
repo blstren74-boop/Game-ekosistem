@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="w-full h-full overflow-hidden select-none">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Feeding Frenzy: Ekosistem Laut Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,10 +11,19 @@
     <!-- Google Font Inter & Pixel/Game Style -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Fredoka', 'Inter', sans-serif;
-            user-select: none;
+        html, body {
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
+            position: fixed;
+            touch-action: none;
+            overscroll-behavior: none;
+            -webkit-user-select: none;
+            user-select: none;
+            font-family: 'Fredoka', 'Inter', sans-serif;
             background-color: #031226;
         }
         
@@ -23,7 +32,7 @@
         }
 
         .glass-card {
-            background: rgba(13, 37, 69, 0.75);
+            background: rgba(13, 37, 69, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
@@ -51,73 +60,81 @@
             box-shadow: 0 6px 20px rgba(56, 239, 125, 0.6);
         }
 
-        /* Animated background elements */
-        .bubble-bg {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5);
-            animation: floatUp 8s infinite linear;
-            pointer-events: none;
+        /* Custom scrollbar for leaderboard & modal text */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
         }
-
-        @keyframes floatUp {
-            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
-            50% { opacity: 0.8; }
-            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
-        }
-
-        /* Custom scrollbar for leaderboard */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
+        .custom-scroll::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.2);
             border-radius: 10px;
         }
-        ::-webkit-scrollbar-thumb {
+        .custom-scroll::-webkit-scrollbar-thumb {
             background: #00b4db;
             border-radius: 10px;
         }
     </style>
 </head>
-<body class="w-screen h-screen relative ocean-gradient text-white flex flex-col justify-between overflow-hidden">
+<body class="w-full h-full relative ocean-gradient text-white flex flex-col justify-between overflow-hidden inset-0">
 
     <div id="bubbleContainer" class="absolute inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
     <!-- MAIN MENU OVERLAY -->
-    <div id="startScreen" class="absolute inset-0 z-40 flex items-center justify-center p-4">
-        <div class="glass-card max-w-lg w-full p-8 rounded-3xl text-center flex flex-col items-center space-y-6 relative border border-cyan-400/30">
-            <!-- Animated Title Header -->
+    <div id="startScreen" class="absolute inset-0 z-40 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-card max-w-lg w-full p-6 md:p-8 rounded-3xl text-center flex flex-col items-center space-y-5 relative border border-cyan-400/30 my-auto">
+            <!-- Title Header -->
             <div class="relative">
-                <i class="fa-solid font-fish text-cyan-400 text-5xl mb-2 animate-bounce"></i>
-                <h1 class="text-4xl md:text-5xl font-extrabold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-yellow-300 drop-shadow-md">
+                <i class="fa-solid fa-fish-fins text-cyan-400 text-4xl md:text-5xl mb-1 animate-bounce"></i>
+                <h1 class="text-3xl md:text-5xl font-extrabold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-yellow-300 drop-shadow-md">
                     FEEDING FRENZY
                 </h1>
-                <p class="text-cyan-200 text-sm font-semibold tracking-wider uppercase mt-1">Edisi Ekosistem Laut & Ekologi</p>
+                <p class="text-cyan-200 text-xs md:text-sm font-semibold tracking-wider uppercase mt-1">Edisi Ekosistem & Ekologi Laut</p>
             </div>
 
-            <!-- Student Name Input Box -->
-            <div class="w-full text-left space-y-2">
-                <label for="playerName" class="block text-xs uppercase tracking-wider text-cyan-300 font-bold">
-                    <i class="fa-solid fa-user-graduate mr-1"></i> Nama Siswa / Pemain:
-                </label>
-                <input type="text" id="playerName" placeholder="Masukkan nama lengkap kamu..." 
-                    class="w-full px-4 py-3 bg-slate-900/80 border border-cyan-500/40 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 font-sans text-base transition">
+            <!-- Student Form Inputs (Nama, Kelas, No. Absen) -->
+            <div class="w-full space-y-3">
+                <div class="text-left space-y-1">
+                    <label for="playerName" class="block text-xs uppercase tracking-wider text-cyan-300 font-bold">
+                        <i class="fa-solid fa-user-graduate mr-1"></i> Nama Lengkap Siswa:
+                    </label>
+                    <input type="text" id="playerName" placeholder="Masukkan nama lengkap kamu..." 
+                        class="w-full px-4 py-2.5 bg-slate-900/90 border border-cyan-500/40 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 font-sans text-sm transition">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="text-left space-y-1">
+                        <label for="playerClass" class="block text-xs uppercase tracking-wider text-cyan-300 font-bold">
+                            <i class="fa-solid fa-school mr-1"></i> Kelas:
+                        </label>
+                        <input type="text" id="playerClass" placeholder="Cth: X IPA 1" 
+                            class="w-full px-4 py-2.5 bg-slate-900/90 border border-cyan-500/40 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 font-sans text-sm transition">
+                    </div>
+                    <div class="text-left space-y-1">
+                        <label for="playerNo" class="block text-xs uppercase tracking-wider text-cyan-300 font-bold">
+                            <i class="fa-solid fa-list-ol mr-1"></i> No. Absen:
+                        </label>
+                        <input type="number" id="playerNo" min="1" max="100" placeholder="Cth: 15" 
+                            class="w-full px-4 py-2.5 bg-slate-900/90 border border-cyan-500/40 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 font-sans text-sm transition">
+                    </div>
+                </div>
             </div>
+
+            <!-- Notification error for inputs -->
+            <p id="inputErrorMsg" class="text-xs text-red-400 font-bold hidden bg-red-950/80 px-3 py-1.5 rounded-lg border border-red-500/40">
+                Harap lengkapi Nama, Kelas, dan No. Absen terlebih dahulu!
+            </p>
 
             <!-- Action Buttons -->
-            <div class="w-full space-y-3 pt-2">
-                <button id="btnPlay" class="btn-primary w-full py-4 rounded-xl font-bold text-lg text-white uppercase tracking-wide flex items-center justify-center space-x-2">
+            <div class="w-full space-y-3 pt-1">
+                <button id="btnPlay" class="btn-primary w-full py-3.5 rounded-xl font-bold text-base text-white uppercase tracking-wide flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-play"></i>
                     <span>Mulai Petualangan</span>
                 </button>
                 <div class="grid grid-cols-2 gap-3">
-                    <button id="btnLeaderboard" class="bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600/50 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2">
+                    <button id="btnLeaderboard" class="bg-slate-800/90 hover:bg-slate-700/90 border border-slate-600/50 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-trophy text-yellow-400"></i>
                         <span>Papan Nilai</span>
                     </button>
-                    <button id="btnHowToPlay" class="bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600/50 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2">
+                    <button id="btnHowToPlay" class="bg-slate-800/90 hover:bg-slate-700/90 border border-slate-600/50 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-circle-info text-cyan-400"></i>
                         <span>Cara Bermain</span>
                     </button>
@@ -125,123 +142,127 @@
             </div>
 
             <!-- Footer info -->
-            <p class="text-xs text-slate-400 pt-2">
-                Pelajari rantai makanan & bertahan hiduplah di kedalaman samudra!
+            <p class="text-[11px] text-slate-400 pt-1">
+                Pelajari 20 soal ekologi & jaga kelestarian ekosistem laut kita!
             </p>
         </div>
     </div>
 
     <!-- GAME HUD OVERLAY (In Game) -->
-    <div id="gameHud" class="absolute top-0 left-0 right-0 z-30 p-4 flex justify-between items-center pointer-events-none hidden">
+    <div id="gameHud" class="absolute top-0 left-0 right-0 z-30 p-3 md:p-4 flex justify-between items-center pointer-events-none hidden">
         <!-- Player Info & Growth Bar -->
-        <div class="glass-card px-5 py-3 rounded-2xl flex items-center space-x-4 border border-cyan-400/30 pointer-events-auto">
+        <div class="glass-card px-4 py-2 rounded-2xl flex items-center space-x-3 border border-cyan-400/30 pointer-events-auto">
             <div class="flex flex-col">
-                <span id="hudPlayerName" class="text-xs font-bold text-cyan-300">Siswa</span>
-                <div class="flex items-center space-x-2">
-                    <span class="text-xs text-slate-300">Level Ikan:</span>
-                    <span id="hudLevelText" class="text-sm font-extrabold text-yellow-300">Ikan Kecil</span>
+                <span id="hudPlayerInfo" class="text-xs font-bold text-cyan-300">Siswa (Kelas/No)</span>
+                <div class="flex items-center space-x-1.5">
+                    <span class="text-[11px] text-slate-300">Level:</span>
+                    <span id="hudLevelText" class="text-xs md:text-sm font-extrabold text-yellow-300">Ikan Kecil</span>
                 </div>
             </div>
             <!-- Growth Bar Container -->
-            <div class="w-32 md:w-48 bg-slate-800 h-4 rounded-full overflow-hidden border border-slate-600 relative">
+            <div class="w-24 md:w-44 bg-slate-800 h-3.5 rounded-full overflow-hidden border border-slate-600 relative">
                 <div id="growthBar" class="bg-gradient-to-r from-teal-400 to-yellow-400 h-full w-0 transition-all duration-300"></div>
-                <span class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white drop-shadow">
-                    <span id="growthText">0 / 100</span>
+                <span class="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-white drop-shadow">
+                    <span id="growthText">0%</span>
                 </span>
             </div>
         </div>
 
         <!-- Score & Life Lives Counter -->
-        <div class="flex items-center space-x-3 pointer-events-auto">
+        <div class="flex items-center space-x-2 pointer-events-auto">
             <!-- Lives / Revives -->
-            <div class="glass-card px-4 py-2 rounded-2xl flex items-center space-x-2 border border-red-400/30">
-                <i class="fa-solid fa-heart text-red-500 text-lg animate-pulse"></i>
-                <span id="hudLives" class="text-lg font-extrabold text-white">3/3</span>
-                <span class="text-xs text-slate-300 hidden md:inline">(Kesempatan Quiz)</span>
+            <div class="glass-card px-3 py-1.5 rounded-2xl flex items-center space-x-1.5 border border-red-400/30">
+                <i class="fa-solid fa-heart text-red-500 text-sm md:text-base animate-pulse"></i>
+                <span id="hudLives" class="text-sm md:text-base font-extrabold text-white">3/3</span>
             </div>
 
             <!-- Score -->
-            <div class="glass-card px-5 py-2 rounded-2xl flex items-center space-x-3 border border-yellow-400/30">
-                <i class="fa-solid fa-star text-yellow-400 text-xl"></i>
+            <div class="glass-card px-4 py-1.5 rounded-2xl flex items-center space-x-2 border border-yellow-400/30">
+                <i class="fa-solid fa-star text-yellow-400 text-base"></i>
                 <div class="flex flex-col">
-                    <span class="text-[10px] text-slate-300 uppercase font-bold tracking-wider">Skor</span>
-                    <span id="hudScore" class="text-xl font-extrabold text-yellow-300">0</span>
+                    <span class="text-[9px] text-slate-300 uppercase font-bold tracking-wider">Skor</span>
+                    <span id="hudScore" class="text-base md:text-lg font-extrabold text-yellow-300">0</span>
                 </div>
             </div>
 
             <!-- Sound Toggle -->
-            <button id="btnSoundToggle" class="glass-card w-11 h-11 rounded-2xl flex items-center justify-center border border-slate-500/30 hover:bg-slate-700/50 transition">
-                <i id="soundIcon" class="fa-solid fa-volume-high text-cyan-300"></i>
+            <button id="btnSoundToggle" class="glass-card w-10 h-10 rounded-2xl flex items-center justify-center border border-slate-500/30 hover:bg-slate-700/50 transition">
+                <i id="soundIcon" class="fa-solid fa-volume-high text-cyan-300 text-sm"></i>
             </button>
         </div>
     </div>
 
     <!-- CANVAS CONTAINER -->
-    <div id="canvasContainer" class="relative w-full h-full z-10">
-        <canvas id="gameCanvas" class="w-full h-full block cursor-none"></canvas>
+    <div id="canvasContainer" class="relative w-full h-full z-10 touch-none">
+        <canvas id="gameCanvas" class="w-full h-full block cursor-none touch-none"></canvas>
     </div>
 
     <!-- ECOLOGY QUIZ MODAL (Triggered when eaten by larger fish) -->
-    <div id="quizModal" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
-        <div class="glass-card max-w-2xl w-full p-6 md:p-8 rounded-3xl border border-yellow-400/50 shadow-2xl space-y-6">
+    <div id="quizModal" class="absolute inset-0 z-50 flex items-center justify-center p-3 md:p-4 bg-black/85 backdrop-blur-md hidden touch-none">
+        <div class="glass-card max-w-2xl w-full p-5 md:p-7 rounded-3xl border border-yellow-400/50 shadow-2xl space-y-4 max-h-[95vh] overflow-y-auto custom-scroll">
             <!-- Header Alert -->
-            <div class="flex items-center space-x-4 border-b border-slate-700/80 pb-4">
-                <div class="w-12 h-12 rounded-2xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400 text-2xl shrink-0">
+            <div class="flex items-center space-x-3 border-b border-slate-700/80 pb-3">
+                <div class="w-10 h-10 rounded-2xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400 text-xl shrink-0">
                     <i class="fa-solid fa-fish-fins"></i>
                 </div>
                 <div>
-                    <h2 class="text-2xl font-bold text-red-400">Ikanmu Dimakan Musuh!</h2>
-                    <p class="text-xs text-slate-300">Jawab pertanyaan ekologi laut dengan benar untuk kesempatan *RESPAWN* (Sisa: <span id="quizLivesLeft" class="font-bold text-yellow-300">3</span>x)!</p>
+                    <h2 class="text-xl md:text-2xl font-bold text-red-400">Ikanmu Dimakan Musuh!</h2>
+                    <p class="text-xs text-slate-300">Jawab pertanyaan ekologi dengan benar untuk *RESPAWN* (Sisa kesempatan: <span id="quizLivesLeft" class="font-bold text-yellow-300">3</span>x)!</p>
                 </div>
             </div>
 
             <!-- Question Text -->
-            <div class="bg-slate-900/90 p-4 md:p-5 rounded-2xl border border-slate-700">
-                <span class="inline-block px-3 py-1 bg-cyan-900/60 text-cyan-300 text-xs font-bold rounded-full mb-2">
-                    <i class="fa-solid fa-book-open mr-1"></i> Pertanyaan Ekologi Dasar
-                </span>
-                <p id="quizQuestion" class="text-base md:text-lg font-medium text-white leading-relaxed">
+            <div class="bg-slate-900/90 p-3.5 md:p-4 rounded-2xl border border-slate-700">
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="inline-block px-2.5 py-0.5 bg-cyan-900/60 text-cyan-300 text-[11px] font-bold rounded-full">
+                        <i class="fa-solid fa-book-open mr-1"></i> Soal Ekologi Laut
+                    </span>
+                    <span id="quizNumberTag" class="text-xs text-slate-400 font-bold">Soal #1</span>
+                </div>
+                <p id="quizQuestion" class="text-sm md:text-base font-medium text-white leading-relaxed">
                     Loading soal...
                 </p>
             </div>
 
             <!-- 5 Multiple Choice Options (A, B, C, D, E) -->
-            <div id="quizOptions" class="grid grid-cols-1 gap-2.5">
+            <div id="quizOptions" class="grid grid-cols-1 gap-2">
                 <!-- Dynamically populated options -->
             </div>
 
             <!-- Result Feedback Notification -->
-            <div id="quizFeedback" class="hidden p-3 rounded-xl text-center text-sm font-bold"></div>
+            <div id="quizFeedback" class="hidden p-2.5 rounded-xl text-center text-xs md:text-sm font-bold"></div>
         </div>
     </div>
 
     <!-- LEADERBOARD MODAL -->
-    <div id="leaderboardModal" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
-        <div class="glass-card max-w-2xl w-full p-6 md:p-8 rounded-3xl border border-cyan-400/40 flex flex-col max-h-[90vh]">
+    <div id="leaderboardModal" class="absolute inset-0 z-50 flex items-center justify-center p-3 md:p-4 bg-black/80 backdrop-blur-md hidden">
+        <div class="glass-card max-w-3xl w-full p-5 md:p-7 rounded-3xl border border-cyan-400/40 flex flex-col max-h-[90vh]">
             <!-- Header -->
-            <div class="flex justify-between items-center pb-4 border-b border-slate-700">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-700">
                 <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-trophy text-yellow-400 text-3xl"></i>
+                    <i class="fa-solid fa-trophy text-yellow-400 text-2xl md:text-3xl"></i>
                     <div>
-                        <h2 class="text-2xl font-bold text-white">Papan Nilai Siswa</h2>
-                        <p class="text-xs text-cyan-300">Peringkat skor Feeding Frenzy Laut</p>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Papan Nilai Siswa</h2>
+                        <p class="text-xs text-cyan-300">Rekapitulasi Skor & Evaluasi Ekologi Laut</p>
                     </div>
                 </div>
-                <button id="btnCloseLeaderboard" class="w-9 h-9 bg-slate-800 hover:bg-slate-700 rounded-full flex items-center justify-center text-slate-300 transition">
+                <button id="btnCloseLeaderboard" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 rounded-full flex items-center justify-center text-slate-300 transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
             <!-- Table content -->
-            <div class="overflow-y-auto flex-1 my-4 pr-1">
-                <table class="w-full text-left text-sm text-slate-300">
-                    <thead class="text-xs uppercase bg-slate-900/80 text-cyan-300 sticky top-0">
+            <div class="overflow-y-auto flex-1 my-3 pr-1 custom-scroll">
+                <table class="w-full text-left text-xs md:text-sm text-slate-300">
+                    <thead class="text-[11px] uppercase bg-slate-900/90 text-cyan-300 sticky top-0">
                         <tr>
-                            <th class="py-3 px-3 rounded-l-lg">#</th>
-                            <th class="py-3 px-3">Nama Siswa</th>
-                            <th class="py-3 px-3 text-center">Skor</th>
-                            <th class="py-3 px-3 text-center">Tingkat Ikan</th>
-                            <th class="py-3 px-3 text-center rounded-r-lg">Quiz Benar</th>
+                            <th class="py-2.5 px-2 rounded-l-lg">#</th>
+                            <th class="py-2.5 px-2">Nama Siswa</th>
+                            <th class="py-2.5 px-2 text-center">Kelas</th>
+                            <th class="py-2.5 px-2 text-center">No</th>
+                            <th class="py-2.5 px-2 text-center">Skor</th>
+                            <th class="py-2.5 px-2 text-center">Tingkat</th>
+                            <th class="py-2.5 px-2 text-center rounded-r-lg">Quiz Benar</th>
                         </tr>
                     </thead>
                     <tbody id="leaderboardTableBody" class="divide-y divide-slate-800">
@@ -251,11 +272,11 @@
             </div>
 
             <!-- Footer Controls (Download CSV Gsheet Token Protected) -->
-            <div class="pt-4 border-t border-slate-700 flex flex-col md:flex-row justify-between items-center gap-3">
-                <span class="text-xs text-slate-400">Diperlukan Token Khusus Guru untuk mengunduh rekap CSV/Gsheet.</span>
-                <button id="btnDownloadLeaderboard" class="btn-success px-5 py-2.5 rounded-xl font-bold text-sm text-slate-900 flex items-center space-x-2">
+            <div class="pt-3 border-t border-slate-700 flex flex-col md:flex-row justify-between items-center gap-2">
+                <span class="text-[11px] text-slate-400 text-center md:text-left">Diperlukan Token Guru (1234) untuk mendownload file CSV rekap nilai.</span>
+                <button id="btnDownloadLeaderboard" class="btn-success px-4 py-2 rounded-xl font-bold text-xs text-slate-900 flex items-center space-x-1.5 shrink-0">
                     <i class="fa-solid fa-file-excel"></i>
-                    <span>Unduh Hasil Nilai (Gsheet)</span>
+                    <span>Unduh Rekap Nilai (Gsheet/CSV)</span>
                 </button>
             </div>
         </div>
@@ -268,53 +289,57 @@
                 <i class="fa-solid fa-key"></i>
             </div>
             <h3 class="text-xl font-bold text-white">Akses Guru / Pengawas</h3>
-            <p class="text-xs text-slate-300">Masukkan Token Rahasia (1234) untuk mendownload file CSV rekap nilai siswa:</p>
+            <p class="text-xs text-slate-300">Masukkan Token Rahasia (1234) untuk mendownload rekap nilai siswa:</p>
             
             <input type="password" id="inputToken" maxlength="10" placeholder="Masukkan token..." 
-                class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-center text-xl tracking-widest text-cyan-300 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-center text-lg tracking-widest text-cyan-300 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
             
             <p id="tokenErrorMsg" class="text-xs text-red-400 font-bold hidden">Token salah! Gunakan token "1234".</p>
 
-            <div class="grid grid-cols-2 gap-2 pt-2">
-                <button id="btnCancelToken" class="bg-slate-800 hover:bg-slate-700 py-2.5 rounded-xl text-xs font-semibold">Batal</button>
-                <button id="btnConfirmToken" class="btn-primary py-2.5 rounded-xl text-xs font-bold">Verifikasi & Download</button>
+            <div class="grid grid-cols-2 gap-2 pt-1">
+                <button id="btnCancelToken" class="bg-slate-800 hover:bg-slate-700 py-2 rounded-xl text-xs font-semibold">Batal</button>
+                <button id="btnConfirmToken" class="btn-primary py-2 rounded-xl text-xs font-bold">Verifikasi & Unduh</button>
             </div>
         </div>
     </div>
 
     <!-- GAME OVER / FINAL RESULT MODAL -->
     <div id="gameOverModal" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden">
-        <div class="glass-card max-w-md w-full p-8 rounded-3xl border border-red-500/40 text-center space-y-6">
+        <div class="glass-card max-w-md w-full p-6 md:p-8 rounded-3xl border border-red-500/40 text-center space-y-5">
             <div class="relative">
-                <i class="fa-solid fa-skull-crossbones text-red-400 text-5xl animate-pulse"></i>
-                <h2 class="text-3xl font-extrabold text-white mt-2">PERMAINAN SELESAI</h2>
+                <i class="fa-solid fa-skull-crossbones text-red-400 text-4xl md:text-5xl animate-pulse"></i>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-white mt-1">PERMAINAN SELESAI</h2>
                 <p class="text-xs text-slate-300">Kesempatan jawaban quiz telah habis!</p>
             </div>
 
-            <div class="bg-slate-900/90 p-4 rounded-2xl border border-slate-800 space-y-2">
-                <div class="flex justify-between text-sm">
+            <div class="bg-slate-900/90 p-4 rounded-2xl border border-slate-800 space-y-2 text-xs md:text-sm">
+                <div class="flex justify-between">
                     <span class="text-slate-400">Pemain:</span>
                     <span id="finalPlayerName" class="font-bold text-cyan-300">Siswa</span>
                 </div>
-                <div class="flex justify-between text-sm">
-                    <span class="text-slate-400">Skor Akhir:</span>
-                    <span id="finalScore" class="font-extrabold text-yellow-300 text-lg">0</span>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Kelas / No. Absen:</span>
+                    <span id="finalPlayerClassNo" class="font-bold text-cyan-300">- / -</span>
                 </div>
-                <div class="flex justify-between text-sm">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Skor Akhir:</span>
+                    <span id="finalScore" class="font-extrabold text-yellow-300 text-base">0</span>
+                </div>
+                <div class="flex justify-between">
                     <span class="text-slate-400">Tingkat Pertumbuhan:</span>
                     <span id="finalStage" class="font-semibold text-teal-300">Ikan Kecil</span>
                 </div>
-                <div class="flex justify-between text-sm">
+                <div class="flex justify-between">
                     <span class="text-slate-400">Quiz Ekologi Terjawab Benar:</span>
                     <span id="finalQuizCorrect" class="font-bold text-green-400">0</span>
                 </div>
             </div>
 
-            <div class="space-y-3">
-                <button id="btnRestartGame" class="btn-primary w-full py-3.5 rounded-xl font-bold text-base uppercase tracking-wide">
+            <div class="space-y-2.5">
+                <button id="btnRestartGame" class="btn-primary w-full py-3 rounded-xl font-bold text-sm uppercase tracking-wide">
                     <i class="fa-solid fa-rotate-right mr-2"></i> Main Lagi
                 </button>
-                <button id="btnGameOverLeaderboard" class="w-full bg-slate-800 hover:bg-slate-700 py-3 rounded-xl font-semibold text-sm">
+                <button id="btnGameOverLeaderboard" class="w-full bg-slate-800 hover:bg-slate-700 py-2.5 rounded-xl font-semibold text-xs">
                     <i class="fa-solid fa-trophy text-yellow-400 mr-2"></i> Lihat Papan Nilai
                 </button>
             </div>
@@ -323,34 +348,40 @@
 
     <!-- HOW TO PLAY MODAL -->
     <div id="howToPlayModal" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
-        <div class="glass-card max-w-lg w-full p-6 md:p-8 rounded-3xl border border-cyan-400/40 space-y-5">
+        <div class="glass-card max-w-lg w-full p-6 md:p-7 rounded-3xl border border-cyan-400/40 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="text-xl font-bold text-cyan-300"><i class="fa-solid fa-gamepad mr-2"></i> Cara Bermain</h3>
+                <h3 class="text-lg md:text-xl font-bold text-cyan-300"><i class="fa-solid fa-gamepad mr-2"></i> Cara Bermain</h3>
                 <button id="btnCloseHowTo" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <ul class="space-y-3 text-xs md:text-sm text-slate-200">
-                <li class="flex items-start space-x-3">
-                    <span class="bg-cyan-500/20 text-cyan-300 w-6 h-6 rounded-full flex items-center justify-center font-bold shrink-0">1</span>
-                    <span>Gerakkan kursor <b>Mouse / Sentuhan Touchscreen</b> untuk mengarahkan renang ikan kamu.</span>
+            <ul class="space-y-2.5 text-xs md:text-sm text-slate-200">
+                <li class="flex items-start space-x-2.5">
+                    <span class="bg-cyan-500/20 text-cyan-300 w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0">1</span>
+                    <span>Gerakkan kursor <b>Mouse atau Sentuhan Touchscreen HP</b> untuk mengarahkan renang ikan kamu.</span>
                 </li>
-                <li class="flex items-start space-x-3">
-                    <span class="bg-cyan-500/20 text-cyan-300 w-6 h-6 rounded-full flex items-center justify-center font-bold shrink-0">2</span>
+                <li class="flex items-start space-x-2.5">
+                    <span class="bg-cyan-500/20 text-cyan-300 w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0">2</span>
                     <span>Makan ikan yang berukuran <b>LEBIH KECIL</b> dari ikanmu untuk menambah ukuran & skor.</span>
                 </li>
-                <li class="flex items-start space-x-3">
-                    <span class="bg-cyan-500/20 text-cyan-300 w-6 h-6 rounded-full flex items-center justify-center font-bold shrink-0">3</span>
-                    <span>Hindari ikan yang berukuran <b>LEBIH BESAR</b> karena mereka akan memakanmu!</span>
+                <li class="flex items-start space-x-2.5">
+                    <span class="bg-cyan-500/20 text-cyan-300 w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0">3</span>
+                    <span>Hindari ikan yang berukuran <b>LEBIH BESAR</b> agar tidak dimakan.</span>
                 </li>
-                <li class="flex items-start space-x-3">
-                    <span class="bg-cyan-500/20 text-cyan-300 w-6 h-6 rounded-full flex items-center justify-center font-bold shrink-0">4</span>
-                    <span>Jika dimakan, kamu harus menjawab soal <b>Pilihan Ganda Ekologi Dasar (5 pilihan)</b> untuk melanjutkan permainan (Maksimal 3 kali kesempatan).</span>
+                <li class="flex items-start space-x-2.5">
+                    <span class="bg-cyan-500/20 text-cyan-300 w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0">4</span>
+                    <span>Jika dimakan musuh, jawab <b>Soal Pilihan Ganda Ekologi Laut (20 Soal Bank)</b> untuk melanjutkan permainan hingga 3x kesempatan!</span>
                 </li>
             </ul>
-            <button id="btnGotIt" class="btn-primary w-full py-3 rounded-xl font-bold text-sm">Mengerti!</button>
+            <button id="btnGotIt" class="btn-primary w-full py-2.5 rounded-xl font-bold text-xs md:text-sm">Mengerti!</button>
         </div>
     </div>
 
     <script>
+        // Prevent layout scrolling/wobble on Android touch devices
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.closest('.custom-scroll')) return;
+            e.preventDefault();
+        }, { passive: false });
+
         // SOUND ENGINE (Web Audio API for sound effects)
         class SoundEngine {
             constructor() {
@@ -417,9 +448,9 @@
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
-                osc.frequency.setValueAtTime(659.25, this.ctx.currentTime + 0.1); // E5
-                osc.frequency.setValueAtTime(783.99, this.ctx.currentTime + 0.2); // G5
+                osc.frequency.setValueAtTime(523.25, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(659.25, this.ctx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(783.99, this.ctx.currentTime + 0.2);
                 gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
                 osc.connect(gain);
@@ -446,7 +477,7 @@
 
         const sound = new SoundEngine();
 
-        // ECOLOGY QUESTION BANK (5 Options Each)
+        // 20 ECOLOGY & MARINE THREATS QUESTION BANK (5 Multiple Choice Options Each)
         const ecologyQuestions = [
             {
                 q: "Di bawah ini yang merupakan komponen ABIOTIK dalam ekosistem laut adalah...",
@@ -557,10 +588,121 @@
                     "Kotak kaku"
                 ],
                 answer: 1
+            },
+            // 10 ADDITIONAL QUESTIONS (Focusing on Marine Ecosystem Issues & Degradation)
+            {
+                q: "[Isu Lingkungan] Dampak utama penggunaan bahan peledak (bom ikan) dan sianida terhadap terumbu karang adalah...",
+                options: [
+                    "Meningkatkan kecerahan dan kejernihan air laut",
+                    "Menghancurkan struktur fisik karang yang butuh puluhan tahun untuk tumbuh",
+                    "Mempercepat pertumbuhan mikroalga menguntungkan",
+                    "Menambah populasi biota terumbu karang secara instan",
+                    "Mengurangi kadar garam di area perairan pantai"
+                ],
+                answer: 1
+            },
+            {
+                q: "[Isu Lingkungan] Fenomena pemutihan karang (Coral Bleaching) terutama dipicu oleh kondisi...",
+                options: [
+                    "Penurunan tekanan udara di permukaan laut",
+                    "Kenaikan suhu air laut akibat pemanasan global yang merusak zooxanthellae",
+                    "Kelebihan pasokan garam laut di kedalaman",
+                    "Aktivitas arus pasang surut yang terlalu tenang",
+                    "Berkurangnya sinar matahari di siang hari"
+                ],
+                answer: 1
+            },
+            {
+                q: "[Isu Lingkungan] Bahaya utama sampah plastik berukuran makro maupun mikroplastik bagi hewan laut seperti penyu dan paus adalah...",
+                options: [
+                    "Membuat warna kulit hewan laut menjadi transparan",
+                    "Penyumbatan saluran pencernaan, keracunan zat kimia, dan keterjeratan",
+                    "Meningkatkan Kecepatan renang mamalia laut secara drastis",
+                    "Membantu pembentukan terumbu karang buatan alami",
+                    "Mengurangi kadar pupuk cair di dasar samudra"
+                ],
+                answer: 1
+            },
+            {
+                q: "[Isu Lingkungan] Praktik penangkapan ikan berlebihan (Overfishing) menggunakan pukat harimau (trawl) berbahaya karena...",
+                options: [
+                    "Menangkap ikan secara selektif sesuai ukuran legal",
+                    "Merusak habitat dasar laut dan menyapu semua biota (bycatch) tanpa sisa",
+                    "Menambah cadangan oksigen terlarut dalam air",
+                    "Mencegah terjadinya pemanasan global di perairan samudra",
+                    "Mempercepat siklus pemijahan alami ikan mas"
+                ],
+                answer: 1
+            },
+            {
+                q: "[Isu Lingkungan] Pembuangan limbah air got kapal (bilge water) dan tumpahan minyak ke laut dapat menyebabkan...",
+                options: [
+                    "Terhalangnya pendaran sinar matahari dan oksigen sehingga mengisolasi perairan",
+                    "Meningkatnya populasi terumbu karang secara masif",
+                    "Penurunan suhu air secara cepat di malam hari",
+                    "Mempercepat fotosintesis rumput laut di kedalaman",
+                    "Meningkatkan kadar vitamin terlarut untuk ikan"
+                ],
+                answer: 0
+            },
+            {
+                q: "[Isu Lingkungan] Penyu laut sering kali secara tidak sengaja memakan kantong plastik transparan yang terapung di laut karena disangka...",
+                options: [
+                    "Ubur-ubur yang merupakan makanan alaminya",
+                    "Bintang laut yang menempel",
+                    "Ikan karang berukuran besar",
+                    "Cangkang kerang yang mengapung",
+                    "Rumput laut cokelat"
+                ],
+                answer: 0
+            },
+            {
+                q: "[Isu Lingkungan] Akumulasi zat beracun (seperti logam berat merkuri) yang konsentrasinya semakin meningkat pada konsumen tingkat atas dinamakan...",
+                options: [
+                    "Suksesi Primer",
+                    "Magnifikasi Biologi (Biomagnification)",
+                    "Daur Nitrogen",
+                    "Kapasitas Dukung Lingkungan",
+                    "Erosi Pantai"
+                ],
+                answer: 1
+            },
+            {
+                q: "[Isu Lingkungan] Fungsi ekologis penting dari kawasan hutan mangrove (bakau) di wilayah pesisir pantai adalah...",
+                options: [
+                    "Menjadi tempat pembuangan limbah industri cair secara alami",
+                    "Mencegah abrasi, menyaring sedimentasi, dan tempat pembesaran (nurseri) juvenil ikan",
+                    "Menghasilkan garam murni dalam jumlah tak terbatas",
+                    "Mematikan populasi mikroalga laut",
+                    "Menghalangi pergerakan gelombang pasang surut matahari"
+                ],
+                answer: 1
+            },
+            {
+                q: "[Isu Lingkungan] Penyerapan gas karbondioksida ($CO_2$) berlebih oleh samudra menyebabkan pengasaman laut (Ocean Acidification). Akibatnya...",
+                options: [
+                    "Cangkang dan kalsium karbonat organisme laut (seperti karang & kerang) mudah melarut & rapuh",
+                    "Air laut berubah warna menjadi merah pekat secara permanen",
+                    "Suhu dasar laut menjadi sangat dingin membeku",
+                    "Ikan-ikan besar kehilangan sirip dorsal",
+                    "Jumlah zooplankton bertambah sepuluh kali lipat"
+                ],
+                answer: 0
+            },
+            {
+                q: "[Isu Lingkungan] Langkah konservasi efektif untuk melindungi keanekaragaman hayati ekosistem laut dari eksploitasi berlebih adalah...",
+                options: [
+                    "Membangun tanggul beton masif di seluruh garis pantai samudra",
+                    "Penetapan Kawasan Konservasi Perairan (Marine Protected Areas/MPA)",
+                    "Menebarkan benih ikan tawar ke laut lepas",
+                    "Membuang sampah organik dalam jumlah tonase besar ke dasar samudra",
+                    "Melarang semua kapal melintas di samudra internasional"
+                ],
+                answer: 1
             }
         ];
 
-        // FISH SPECIES CONFIGURATION FOR VISUAL VARIETY (Feeding Frenzy style)
+        // FISH SPECIES CONFIGURATION
         const SPECIES_CONFIG = [
             {
                 type: 'guppy',
@@ -621,10 +763,12 @@
                 this.canvas = document.getElementById('gameCanvas');
                 this.ctx = this.canvas.getContext('2d');
                 this.playerName = 'Siswa';
+                this.playerClass = '-';
+                this.playerNo = '-';
                 this.score = 0;
                 this.growth = 0;
                 this.maxGrowth = 100;
-                this.tier = 1; // 1: Small, 2: Medium, 3: Large, 4: Giant Apex
+                this.tier = 1;
                 this.lives = 3;
                 this.quizCorrectCount = 0;
                 this.isRunning = false;
@@ -652,7 +796,6 @@
             }
 
             initEcosystemEnvironment() {
-                // Generate kelp plants with wave physics offsets
                 this.kelpForest = [];
                 const kelpCount = Math.floor(window.innerWidth / 45) + 4;
                 for (let i = 0; i < kelpCount; i++) {
@@ -665,7 +808,6 @@
                     });
                 }
 
-                // Generate Coral Reef structures at bottom
                 this.corals = [];
                 const coralColors = ['#e76f51', '#f4a261', '#e9c46a', '#ee6c4d', '#3a86ff', '#8338ec', '#ff006e'];
                 for (let x = 20; x < window.innerWidth + 50; x += 80 + Math.random() * 60) {
@@ -678,7 +820,6 @@
                     });
                 }
 
-                // Generate Starfishes on seabed
                 this.seabedStarfish = [];
                 for (let i = 0; i < 9; i++) {
                     this.seabedStarfish.push({
@@ -690,7 +831,6 @@
                     });
                 }
 
-                // Distant background silhouettes (Parallax Whale / Manta Ray)
                 this.bgCreatures = [
                     { x: -150, y: window.innerHeight * 0.35, vx: 0.35, type: 'manta', size: 85 },
                     { x: window.innerWidth + 250, y: window.innerHeight * 0.22, vx: -0.2, type: 'whale', size: 170 }
@@ -709,7 +849,7 @@
 
             generateBgBubbles() {
                 this.bgBubbles = [];
-                for (let i = 0; i < 45; i++) {
+                for (let i = 0; i < 40; i++) {
                     this.bgBubbles.push({
                         x: Math.random() * this.canvas.width,
                         y: Math.random() * this.canvas.height,
@@ -720,8 +860,10 @@
                 }
             }
 
-            start(playerName) {
+            start(playerName, playerClass, playerNo) {
                 this.playerName = playerName || 'Siswa';
+                this.playerClass = playerClass || '-';
+                this.playerNo = playerNo || '-';
                 this.score = 0;
                 this.growth = 0;
                 this.tier = 1;
@@ -730,12 +872,10 @@
                 this.fishes = [];
                 this.floatingTexts = [];
                 
-                // Initialize player fish
                 this.player = {
                     x: this.canvas.width / 2,
                     y: this.canvas.height / 2,
-                    radius: 16, // Size
-                    angle: 0,
+                    radius: 16,
                     facingRight: true,
                     mouthOpen: 0,
                     invulnerableTimer: 0,
@@ -748,16 +888,13 @@
                 this.isRunning = true;
                 this.isPaused = false;
                 
-                // Update HUD
-                document.getElementById('hudPlayerName').innerText = this.playerName;
+                document.getElementById('hudPlayerInfo').innerText = `${this.playerName} (${this.playerClass}/${this.playerNo})`;
                 this.updateHud();
 
-                // Spawn initial fishes
                 for(let i = 0; i < 12; i++) {
                     this.spawnFish(true);
                 }
 
-                // Start game loop
                 requestAnimationFrame((timestamp) => this.gameLoop(timestamp));
             }
 
@@ -768,17 +905,22 @@
                     this.mouseY = e.clientY;
                 });
 
-                // Touch tracking for mobile
-                window.addEventListener('touchmove', (e) => {
-                    if (e.touches.length > 0) {
+                // Touch tracking for Android/Mobile with event lock
+                const handleTouch = (e) => {
+                    if (e.touches && e.touches.length > 0) {
                         this.mouseX = e.touches[0].clientX;
                         this.mouseY = e.touches[0].clientY;
                     }
-                }, { passive: true });
+                };
+
+                this.canvas.addEventListener('touchstart', handleTouch, { passive: true });
+                this.canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    handleTouch(e);
+                }, { passive: false });
             }
 
             spawnFish(initial = false) {
-                // Pick species based on current player tier to ensure eating targets exist
                 let speciesIndex;
                 const rand = Math.random();
 
@@ -795,7 +937,6 @@
                 const config = SPECIES_CONFIG[speciesIndex];
                 const radius = config.minSize + Math.random() * (config.maxSize - config.minSize);
                 
-                // Spawn position
                 const fromLeft = Math.random() < 0.5;
                 const x = initial 
                     ? Math.random() * this.canvas.width 
@@ -819,7 +960,6 @@
                 ctx.save();
                 ctx.translate(x, y);
                 
-                // Direction flip
                 if (!facingRight) {
                     ctx.scale(-1, 1);
                 }
@@ -836,7 +976,7 @@
                 ctx.closePath();
                 ctx.fill();
 
-                // 2. Dorsal Fin (Top)
+                // 2. Dorsal Fin
                 ctx.beginPath();
                 ctx.moveTo(-radius * 0.2, -radius * 0.7);
                 ctx.quadraticCurveTo(radius * 0.2, -radius * 1.2, radius * 0.5, -radius * 0.4);
@@ -844,13 +984,12 @@
                 ctx.closePath();
                 ctx.fill();
 
-                // 3. Main Body Body (Ellipse/Path)
+                // 3. Body
                 ctx.fillStyle = config.bodyColor || '#333';
                 ctx.beginPath();
                 ctx.ellipse(0, 0, radius * 1.1, radius * 0.75, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Belly / Stripes accents for specific types
                 if (config.type === 'clownfish') {
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(-radius * 0.2, -radius * 0.65, radius * 0.25, radius * 1.3);
@@ -873,13 +1012,7 @@
                 ctx.arc(radius * 0.55, -radius * 0.2, Math.max(1.5, radius * 0.11), 0, Math.PI * 2);
                 ctx.fill();
 
-                // Highlight shine in eye
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.arc(radius * 0.58, -radius * 0.26, Math.max(0.8, radius * 0.05), 0, Math.PI * 2);
-                ctx.fill();
-
-                // 5. Mouth (Opening Animation when eating)
+                // 5. Mouth
                 if (mouthAngle > 0) {
                     ctx.fillStyle = '#0a1d37';
                     ctx.beginPath();
@@ -890,9 +1023,8 @@
                     ctx.fill();
                 }
 
-                // Highlight border if player
                 if (isPlayer) {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.ellipse(0, 0, radius * 1.15, radius * 0.8, 0, 0, Math.PI * 2);
@@ -905,7 +1037,6 @@
             update(timestamp) {
                 if (this.isPaused) return;
 
-                // Move ambient bubbles
                 this.bgBubbles.forEach(b => {
                     b.y -= b.speed;
                     if (b.y < -10) {
@@ -914,7 +1045,6 @@
                     }
                 });
 
-                // Update Player Position towards Mouse smoothly
                 const dx = this.mouseX - this.player.x;
                 const dy = this.mouseY - this.player.y;
                 const dist = Math.hypot(dx, dy);
@@ -930,49 +1060,35 @@
                 if (this.player.mouthOpen > 0) this.player.mouthOpen -= 0.05;
                 if (this.player.invulnerableTimer > 0) this.player.invulnerableTimer--;
 
-                // Player config based on tier
-                const playerConfig = {
-                    bodyColor: this.tier === 1 ? '#00f2fe' : (this.tier === 2 ? '#4facfe' : (this.tier === 3 ? '#ff0844' : '#f6d365')),
-                    finColor: '#ffb199',
-                    type: 'player'
-                };
-
-                // Spawn new enemy fishes
                 if (timestamp - this.lastSpawnTime > 1200 && this.fishes.length < 18) {
                     this.spawnFish();
                     this.lastSpawnTime = timestamp;
                 }
 
-                // Update Enemy Fishes
                 for (let i = this.fishes.length - 1; i >= 0; i--) {
                     const fish = this.fishes[i];
                     fish.x += fish.vx;
                     fish.y += Math.sin(fish.x * 0.02) * 0.8;
                     fish.swimCycle += 1;
 
-                    // Remove offscreen
                     if ((fish.vx > 0 && fish.x > this.canvas.width + 100) || 
                         (fish.vx < 0 && fish.x < -100)) {
                         this.fishes.splice(i, 1);
                         continue;
                     }
 
-                    // Collision check with Player
                     const pDist = Math.hypot(this.player.x - fish.x, this.player.y - fish.y);
                     const eatDistance = (this.player.radius + fish.radius) * 0.75;
 
                     if (pDist < eatDistance) {
-                        // PLAYER EATS SMALLER FISH
                         if (this.player.radius >= fish.radius * 0.95) {
                             sound.playEat();
                             this.player.mouthOpen = 0.4;
                             
-                            // Add Score & Growth
                             const gainedScore = Math.round(fish.radius * 10);
                             this.score += gainedScore;
                             this.growth += fish.radius * 0.6;
 
-                            // Create Floating +Score Text
                             this.floatingTexts.push({
                                 text: `+${gainedScore}`,
                                 x: fish.x,
@@ -981,12 +1097,9 @@
                                 vy: -1.5
                             });
 
-                            // Check Growth Level Up
                             this.checkGrowth();
-
                             this.fishes.splice(i, 1);
                         } 
-                        // ENEMY EATS PLAYER (If invulnerability frame is off)
                         else if (this.player.invulnerableTimer <= 0) {
                             sound.playHurt();
                             this.triggerQuizModal();
@@ -995,7 +1108,6 @@
                     }
                 }
 
-                // Update Floating Texts
                 for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
                     const ft = this.floatingTexts[i];
                     ft.y += ft.vy;
@@ -1028,7 +1140,6 @@
                             vy: -2
                         });
                     } else {
-                        // Max Tier capped
                         this.growth = this.maxGrowth;
                     }
                 }
@@ -1050,13 +1161,10 @@
             }
 
             render() {
-                // Clear Canvas
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                const time = Date.now() * 0.0015;
 
-                const now = Date.now();
-                const time = now * 0.0015;
-
-                // 1. Render Sunlight Rays at Top Surface
+                // 1. Sunlight Rays
                 this.ctx.save();
                 for (let i = 0; i < 6; i++) {
                     const alpha = 0.03 + Math.sin(time + i) * 0.015;
@@ -1076,7 +1184,7 @@
                 }
                 this.ctx.restore();
 
-                // 2. Render Far Background Creature Silhouettes (Manta Ray & Whale)
+                // 2. Background Creature Silhouettes
                 this.bgCreatures.forEach(creature => {
                     creature.x += creature.vx;
                     if (creature.vx > 0 && creature.x > this.canvas.width + 250) creature.x = -250;
@@ -1095,30 +1203,15 @@
                         this.ctx.quadraticCurveTo(-creature.size * 0.3, creature.size * 0.2, -creature.size * 0.8, -creature.size * 0.1);
                         this.ctx.quadraticCurveTo(-creature.size * 0.4, -creature.size * 0.3, 0, 0);
                         this.ctx.fill();
-                        // Tail
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(0, creature.size * 0.05);
-                        this.ctx.lineTo(-creature.size * 0.9, creature.size * 0.15);
-                        this.ctx.strokeStyle = 'rgba(2, 25, 50, 0.45)';
-                        this.ctx.lineWidth = 3;
-                        this.ctx.stroke();
                     } else if (creature.type === 'whale') {
                         this.ctx.beginPath();
                         this.ctx.ellipse(0, 0, creature.size * 0.7, creature.size * 0.22, 0, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        // Tail fin
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(-creature.size * 0.65, 0);
-                        this.ctx.lineTo(-creature.size * 0.85, -creature.size * 0.2);
-                        this.ctx.lineTo(-creature.size * 0.8, 0);
-                        this.ctx.lineTo(-creature.size * 0.85, creature.size * 0.2);
-                        this.ctx.closePath();
                         this.ctx.fill();
                     }
                     this.ctx.restore();
                 });
 
-                // 3. Render Seabed Terrain / Sand Layer
+                // 3. Seabed Terrain
                 const seabedY = this.canvas.height - 25;
                 this.ctx.fillStyle = '#062038';
                 this.ctx.beginPath();
@@ -1131,7 +1224,7 @@
                 this.ctx.closePath();
                 this.ctx.fill();
 
-                // 4. Render Starfishes & Shells on Seabed
+                // 4. Starfishes
                 this.seabedStarfish.forEach(star => {
                     this.ctx.save();
                     this.ctx.translate(star.x, seabedY - star.yOffset);
@@ -1147,18 +1240,16 @@
                     this.ctx.restore();
                 });
 
-                // 5. Render Coral Reefs (Brain, Branching, Anemones)
+                // 5. Corals
                 this.corals.forEach(coral => {
                     this.ctx.save();
                     this.ctx.translate(coral.x, seabedY - 5);
-                    
                     if (coral.type === 'brain') {
                         this.ctx.fillStyle = coral.color;
                         this.ctx.beginPath();
                         this.ctx.arc(0, -coral.size * 0.4, coral.size * 0.45, Math.PI, 0);
                         this.ctx.fill();
                     } else if (coral.type === 'anemone') {
-                        // Swaying Tentacles
                         this.ctx.strokeStyle = coral.color;
                         this.ctx.lineWidth = 4;
                         this.ctx.lineCap = 'round';
@@ -1181,7 +1272,7 @@
                         this.ctx.moveTo(0, -coral.size * 0.4);
                         this.ctx.lineTo(coral.size * 0.3, -coral.size * 0.75);
                         this.ctx.stroke();
-                    } else { // Table Coral
+                    } else {
                         this.ctx.fillStyle = coral.color;
                         this.ctx.fillRect(-6, -coral.size * 0.6, 12, coral.size * 0.6);
                         this.ctx.beginPath();
@@ -1191,7 +1282,7 @@
                     this.ctx.restore();
                 });
 
-                // 6. Render Swaying Kelp / Seaweed Forest
+                // 6. Kelp Forest
                 this.kelpForest.forEach(kelp => {
                     this.ctx.save();
                     this.ctx.fillStyle = kelp.color;
@@ -1202,24 +1293,14 @@
                     const tipX = kelp.x + baseSway;
                     const tipY = seabedY - kelp.height;
 
-                    this.ctx.quadraticCurveTo(
-                        kelp.x + baseSway * 0.5, 
-                        seabedY - kelp.height * 0.5, 
-                        tipX, 
-                        tipY
-                    );
-                    this.ctx.quadraticCurveTo(
-                        kelp.x + kelp.width + baseSway * 0.5, 
-                        seabedY - kelp.height * 0.5, 
-                        kelp.x + kelp.width, 
-                        seabedY
-                    );
+                    this.ctx.quadraticCurveTo(kelp.x + baseSway * 0.5, seabedY - kelp.height * 0.5, tipX, tipY);
+                    this.ctx.quadraticCurveTo(kelp.x + kelp.width + baseSway * 0.5, seabedY - kelp.height * 0.5, kelp.x + kelp.width, seabedY);
                     this.ctx.closePath();
                     this.ctx.fill();
                     this.ctx.restore();
                 });
 
-                // 7. Render Ambient Floating Bubbles / Marine Particles
+                // 7. Ambient Bubbles
                 this.bgBubbles.forEach(b => {
                     this.ctx.fillStyle = `rgba(255, 255, 255, ${b.alpha})`;
                     this.ctx.beginPath();
@@ -1227,15 +1308,12 @@
                     this.ctx.fill();
                 });
 
-                // 8. Render Enemy Fishes
+                // 8. Enemy Fishes
                 this.fishes.forEach(fish => {
-                    this.drawFish(
-                        this.ctx, fish.x, fish.y, fish.radius, 
-                        fish.facingRight, fish.config, fish.swimCycle
-                    );
+                    this.drawFish(this.ctx, fish.x, fish.y, fish.radius, fish.facingRight, fish.config, fish.swimCycle);
                 });
 
-                // 9. Render Player Fish
+                // 9. Player Fish
                 if (this.player) {
                     const playerConfig = {
                         bodyColor: this.tier === 1 ? '#00f2fe' : (this.tier === 2 ? '#38ef7d' : (this.tier === 3 ? '#ff9a9e' : '#f6d365')),
@@ -1243,7 +1321,6 @@
                         type: 'player'
                     };
 
-                    // Flash when invulnerable
                     if (this.player.invulnerableTimer % 6 < 3) {
                         this.drawFish(
                             this.ctx, this.player.x, this.player.y, this.player.radius, 
@@ -1253,7 +1330,7 @@
                     }
                 }
 
-                // 10. Render Floating +Score / LevelUp Texts
+                // 10. Floating Text
                 this.floatingTexts.forEach(ft => {
                     this.ctx.fillStyle = `rgba(255, 215, 0, ${ft.opacity})`;
                     this.ctx.font = 'bold 18px Fredoka, sans-serif';
@@ -1284,21 +1361,21 @@
                 document.getElementById('quizLivesLeft').innerText = this.lives;
                 document.getElementById('quizFeedback').classList.add('hidden');
 
-                // Pick random question
-                this.currentQuestion = ecologyQuestions[Math.floor(Math.random() * ecologyQuestions.length)];
+                const randomIdx = Math.floor(Math.random() * ecologyQuestions.length);
+                this.currentQuestion = ecologyQuestions[randomIdx];
                 
+                document.getElementById('quizNumberTag').innerText = `Soal #${randomIdx + 1} dari 20`;
                 document.getElementById('quizQuestion').innerText = this.currentQuestion.q;
 
-                // Render 5 options
                 const optionsContainer = document.getElementById('quizOptions');
                 optionsContainer.innerHTML = '';
 
                 const prefixes = ['A', 'B', 'C', 'D', 'E'];
                 this.currentQuestion.options.forEach((optText, index) => {
                     const btn = document.createElement('button');
-                    btn.className = "w-full text-left p-3.5 bg-slate-800/90 hover:bg-cyan-900/60 border border-slate-700 hover:border-cyan-400 rounded-xl transition flex items-start space-x-3 text-sm text-slate-200 font-medium";
+                    btn.className = "w-full text-left p-3 bg-slate-800/90 hover:bg-cyan-900/60 border border-slate-700 hover:border-cyan-400 rounded-xl transition flex items-start space-x-2.5 text-xs md:text-sm text-slate-200 font-medium";
                     btn.innerHTML = `
-                        <span class="w-6 h-6 rounded-lg bg-slate-700 text-cyan-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">${prefixes[index]}</span>
+                        <span class="w-5 h-5 rounded-lg bg-slate-700 text-cyan-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">${prefixes[index]}</span>
                         <span class="flex-1">${optText}</span>
                     `;
                     btn.onclick = () => this.submitAnswer(index);
@@ -1313,35 +1390,30 @@
                 feedbackEl.classList.remove('hidden', 'bg-green-500/20', 'text-green-300', 'bg-red-500/20', 'text-red-300');
 
                 if (selectedIndex === this.currentQuestion.answer) {
-                    // CORRECT ANSWER
                     sound.playCorrect();
                     this.quizCorrectCount++;
-                    this.lives--;
                     
                     feedbackEl.classList.add('bg-green-500/20', 'text-green-300', 'border', 'border-green-500/40');
                     feedbackEl.innerText = "JAWABAN BENAR! Kamu mendapatkan kesempatan hidup kembali!";
 
                     setTimeout(() => {
                         document.getElementById('quizModal').classList.add('hidden');
-                        // Respawn player safely
                         this.player.x = this.canvas.width / 2;
                         this.player.y = this.canvas.height / 2;
-                        this.player.invulnerableTimer = 120; // 2 seconds grace period
+                        this.player.invulnerableTimer = 120;
                         this.isPaused = false;
                     }, 1500);
 
                 } else {
-                    // INCORRECT ANSWER
                     sound.playWrong();
                     this.lives--;
 
                     feedbackEl.classList.add('bg-red-500/20', 'text-red-300', 'border', 'border-red-500/40');
-                    feedbackEl.innerText = `JAWABAN SALAH! Jawaban yang benar: (${['A','B','C','D','E'][this.currentQuestion.answer]}) ${this.currentQuestion.options[this.currentQuestion.answer]}`;
+                    feedbackEl.innerText = `JAWABAN SALAH! Kunci: (${['A','B','C','D','E'][this.currentQuestion.answer]}) ${this.currentQuestion.options[this.currentQuestion.answer]}`;
 
                     setTimeout(() => {
                         document.getElementById('quizModal').classList.add('hidden');
                         if (this.lives > 0) {
-                            // Give another chance or resume
                             this.player.x = this.canvas.width / 2;
                             this.player.y = this.canvas.height / 2;
                             this.player.invulnerableTimer = 120;
@@ -1349,7 +1421,7 @@
                         } else {
                             this.gameOver();
                         }
-                    }, 2200);
+                    }, 2400);
                 }
             }
 
@@ -1357,17 +1429,18 @@
                 this.isRunning = false;
                 sound.playHurt();
 
-                // Save score to leaderboard
                 saveScoreToLeaderboard({
                     name: this.playerName,
+                    class: this.playerClass,
+                    no: this.playerNo,
                     score: this.score,
                     tier: this.tier,
                     quizCorrect: this.quizCorrectCount,
                     date: new Date().toLocaleDateString('id-ID')
                 });
 
-                // Update Game Over Modal
                 document.getElementById('finalPlayerName').innerText = this.playerName;
+                document.getElementById('finalPlayerClassNo').innerText = `${this.playerClass} / No. ${this.playerNo}`;
                 document.getElementById('finalScore').innerText = this.score;
                 
                 let stageName = "Ikan Kecil";
@@ -1382,7 +1455,7 @@
         }
 
         // LEADERBOARD STORAGE SYSTEM (LocalStorage + CSV Export)
-        const LEADERBOARD_KEY = 'feeding_frenzy_ecology_scores';
+        const LEADERBOARD_KEY = 'feeding_frenzy_ecology_v2_scores';
 
         function getLeaderboard() {
             const data = localStorage.getItem(LEADERBOARD_KEY);
@@ -1392,7 +1465,6 @@
         function saveScoreToLeaderboard(entry) {
             const list = getLeaderboard();
             list.push(entry);
-            // Sort high score first
             list.sort((a, b) => b.score - a.score);
             localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(list));
         }
@@ -1403,11 +1475,11 @@
             tbody.innerHTML = '';
 
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Belum ada skor tercatat. Mainkan game sekarang!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Belum ada skor tercatat. Mainkan game sekarang!</td></tr>`;
                 return;
             }
 
-            list.slice(0, 20).forEach((item, idx) => {
+            list.slice(0, 25).forEach((item, idx) => {
                 let stageLabel = "Kecil";
                 if (item.tier === 2) stageLabel = "Sedang";
                 if (item.tier === 3) stageLabel = "Besar";
@@ -1416,11 +1488,13 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-800/50 transition";
                 tr.innerHTML = `
-                    <td class="py-3 px-3 font-bold ${idx === 0 ? 'text-yellow-400' : (idx === 1 ? 'text-slate-300' : (idx === 2 ? 'text-amber-600' : 'text-slate-500'))}">${idx + 1}</td>
-                    <td class="py-3 px-3 font-semibold text-white">${item.name}</td>
-                    <td class="py-3 px-3 text-center font-extrabold text-yellow-300">${item.score}</td>
-                    <td class="py-3 px-3 text-center text-xs text-teal-300">${stageLabel}</td>
-                    <td class="py-3 px-3 text-center font-bold text-green-400">${item.quizCorrect || 0}</td>
+                    <td class="py-2.5 px-2 font-bold ${idx === 0 ? 'text-yellow-400' : (idx === 1 ? 'text-slate-300' : (idx === 2 ? 'text-amber-600' : 'text-slate-500'))}">${idx + 1}</td>
+                    <td class="py-2.5 px-2 font-semibold text-white">${item.name}</td>
+                    <td class="py-2.5 px-2 text-center text-cyan-300 font-bold">${item.class || '-'}</td>
+                    <td class="py-2.5 px-2 text-center text-slate-300">${item.no || '-'}</td>
+                    <td class="py-2.5 px-2 text-center font-extrabold text-yellow-300">${item.score}</td>
+                    <td class="py-2.5 px-2 text-center text-xs text-teal-300">${stageLabel}</td>
+                    <td class="py-2.5 px-2 text-center font-bold text-green-400">${item.quizCorrect || 0}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1434,9 +1508,8 @@
                 return;
             }
 
-            // Generate CSV content with UTF-8 BOM for Microsoft Excel / Google Sheets compatibility
             let csvContent = "\uFEFF"; // UTF-8 BOM
-            csvContent += "No,Nama Siswa,Tanggal,Skor Akhir,Tingkat Pertumbuhan,Quiz Ekologi Benar\n";
+            csvContent += "No,Nama Siswa,Kelas,No Absen,Tanggal,Skor Akhir,Tingkat Pertumbuhan,Quiz Ekologi Benar\n";
 
             list.forEach((item, index) => {
                 let stageLabel = "Ikan Kecil";
@@ -1446,7 +1519,9 @@
 
                 const row = [
                     index + 1,
-                    `"${item.name.replace(/"/g, '""')}"`,
+                    `"${(item.name || '').replace(/"/g, '""')}"`,
+                    `"${(item.class || '-').replace(/"/g, '""')}"`,
+                    `"${item.no || '-'}"`,
                     `"${item.date || '-'}"`,
                     item.score,
                     `"${stageLabel}"`,
@@ -1456,7 +1531,6 @@
                 csvContent += row + "\n";
             });
 
-            // Trigger download
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
@@ -1476,16 +1550,22 @@
             // Play Button
             document.getElementById('btnPlay').onclick = () => {
                 const nameInput = document.getElementById('playerName').value.trim();
-                if (!nameInput) {
-                    alert('Harap masukkan nama siswa terlebih dahulu!');
+                const classInput = document.getElementById('playerClass').value.trim();
+                const noInput = document.getElementById('playerNo').value.trim();
+
+                const errorEl = document.getElementById('inputErrorMsg');
+
+                if (!nameInput || !classInput || !noInput) {
+                    errorEl.classList.remove('hidden');
                     return;
                 }
+                errorEl.classList.add('hidden');
 
                 sound.init();
                 document.getElementById('startScreen').classList.add('hidden');
                 document.getElementById('gameHud').classList.remove('hidden');
 
-                currentGame.start(nameInput);
+                currentGame.start(nameInput, classInput, noInput);
             };
 
             // Sound Toggle Button
@@ -1493,9 +1573,9 @@
                 sound.muted = !sound.muted;
                 const icon = document.getElementById('soundIcon');
                 if (sound.muted) {
-                    icon.className = 'fa-solid fa-volume-xmark text-red-400';
+                    icon.className = 'fa-solid fa-volume-xmark text-red-400 text-sm';
                 } else {
-                    icon.className = 'fa-solid fa-volume-high text-cyan-300';
+                    icon.className = 'fa-solid fa-volume-high text-cyan-300 text-sm';
                 }
             };
 
@@ -1545,7 +1625,9 @@
             document.getElementById('btnRestartGame').onclick = () => {
                 document.getElementById('gameOverModal').classList.add('hidden');
                 const name = document.getElementById('playerName').value.trim() || 'Siswa';
-                currentGame.start(name);
+                const pClass = document.getElementById('playerClass').value.trim() || '-';
+                const pNo = document.getElementById('playerNo').value.trim() || '-';
+                currentGame.start(name, pClass, pNo);
             };
 
             document.getElementById('btnGameOverLeaderboard').onclick = () => {
