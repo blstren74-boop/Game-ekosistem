@@ -364,10 +364,14 @@
                 </li>
                 <li class="flex items-start space-x-2.5">
                     <span class="bg-cyan-500/20 text-cyan-300 w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0">3</span>
-                    <span>Hindari ikan yang berukuran <b>LEBIH BESAR</b> agar tidak dimakan.</span>
+                    <span><b>HATI-HATI HIU!</b> Ikan Hiu besar akan mengejar ikan kamu secara aktif jika terdeteksi.</span>
                 </li>
                 <li class="flex items-start space-x-2.5">
                     <span class="bg-cyan-500/20 text-cyan-300 w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0">4</span>
+                    <span><b>BERSEMBUNYI:</b> Berenanglah ke dasar perairan di sela-sela <b>Algae & Terumbu Karang</b> agar Hiu kehilangan jejak!</span>
+                </li>
+                <li class="flex items-start space-x-2.5">
+                    <span class="bg-cyan-500/20 text-cyan-300 w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0">5</span>
                     <span>Jika dimakan musuh, jawab <b>Soal Pilihan Ganda Ekologi Laut (20 Soal Bank)</b> untuk melanjutkan permainan hingga 3x kesempatan!</span>
                 </li>
             </ul>
@@ -787,6 +791,7 @@
                 this.mouseX = 0;
                 this.mouseY = 0;
                 this.lastSpawnTime = 0;
+                this.lastSharkSpawnTime = 0; // Waktu terakhir hiu muncul untuk pemunculan temporal
                 this.currentQuestion = null;
                 // Menyimpan indeks soal sebelumnya agar tidak berulang berurutan
                 this.lastQuestionIndex = -1;
@@ -881,7 +886,8 @@
                     facingRight: true,
                     mouthOpen: 0,
                     invulnerableTimer: 0,
-                    swimCycle: 0
+                    swimCycle: 0,
+                    isHiding: false
                 };
 
                 this.mouseX = this.player.x;
@@ -926,14 +932,34 @@
                 let speciesIndex;
                 const rand = Math.random();
 
+                // Cek apakah sudah ada hiu di dalam ekosistem
+                const hasShark = this.fishes.some(f => f.config && f.config.type === 'shark');
+                const now = Date.now();
+                // Cooldown 15 detik agar hiu muncul secara temporal/berkala
+                const sharkCooldownPassed = !this.lastSharkSpawnTime || (now - this.lastSharkSpawnTime > 15000);
+
                 if (this.tier === 1) {
                     speciesIndex = rand < 0.65 ? 0 : (rand < 0.9 ? 1 : 2);
                 } else if (this.tier === 2) {
                     speciesIndex = rand < 0.35 ? 0 : (rand < 0.7 ? 1 : (rand < 0.9 ? 2 : 3));
                 } else if (this.tier === 3) {
-                    speciesIndex = rand < 0.2 ? 0 : (rand < 0.45 ? 1 : (rand < 0.75 ? 2 : 4));
+                    // Hiu hanya bisa muncul jika BELUM ADA hiu di layar & cooldown 15s sudah lewat
+                    if (!hasShark && sharkCooldownPassed && rand > 0.75) {
+                        speciesIndex = 4; // Hiu Karang
+                    } else {
+                        speciesIndex = rand < 0.35 ? 0 : (rand < 0.7 ? 1 : 2);
+                    }
                 } else {
-                    speciesIndex = Math.floor(Math.random() * SPECIES_CONFIG.length);
+                    // Level Hiu (Tier 4) - Tetap dibatasi maksimal 1 hiu secara temporal
+                    if (!hasShark && sharkCooldownPassed && rand > 0.7) {
+                        speciesIndex = 4; // Hiu Karang
+                    } else {
+                        speciesIndex = Math.floor(Math.random() * 4); // Ikan non-hiu (0-3)
+                    }
+                }
+
+                if (speciesIndex === 4) {
+                    this.lastSharkSpawnTime = now;
                 }
 
                 const config = SPECIES_CONFIG[speciesIndex];
@@ -944,29 +970,36 @@
                     ? Math.random() * this.canvas.width 
                     : (fromLeft ? -radius * 2 : this.canvas.width + radius * 2);
                 const y = Math.random() * (this.canvas.height - 120) + 60;
-                const vx = (fromLeft ? 1 : -1) * (config.speed + Math.random() * 0.8);
+                const vxDir = fromLeft ? 1 : -1;
+                const vx = vxDir * (config.speed + Math.random() * 0.8);
                 
                 this.fishes.push({
                     x: x,
                     y: y,
                     vx: vx,
                     vy: Math.sin(x * 0.01) * 0.5,
+                    originalVxDir: vxDir,
                     radius: radius,
                     config: config,
                     facingRight: vx > 0,
-                    swimCycle: Math.random() * 100
+                    swimCycle: Math.random() * 100,
+                    isChasing: false
                 });
             }
 
-            drawFish(ctx, x, y, radius, facingRight, config, swimCycle, mouthAngle = 0, isPlayer = false) {
+            drawFish(ctx, x, y, radius, facingRight, config, swimCycle, mouthAngle = 0, isPlayer = false, isChasing = false, isHiding = false) {
                 ctx.save();
                 ctx.translate(x, y);
+
+                if (isPlayer && isHiding) {
+                    ctx.globalAlpha = 0.6; // Efek semi-transparan saat bersembunyi di tanaman
+                }
                 
                 if (!facingRight) {
                     ctx.scale(-1, 1);
                 }
 
-                const tailWiggle = Math.sin(swimCycle * 0.2) * (radius * 0.25);
+                const tailWiggle = Math.sin(swimCycle * (isChasing ? 0.4 : 0.2)) * (radius * 0.25);
 
                 // 1. Tail Fin
                 ctx.fillStyle = config.finColor || '#ff8000';
@@ -1004,7 +1037,7 @@
                 }
 
                 // 4. Eye
-                ctx.fillStyle = '#ffffff';
+                ctx.fillStyle = isChasing ? '#ff2222' : '#ffffff';
                 ctx.beginPath();
                 ctx.arc(radius * 0.5, -radius * 0.2, Math.max(3, radius * 0.22), 0, Math.PI * 2);
                 ctx.fill();
@@ -1015,18 +1048,18 @@
                 ctx.fill();
 
                 // 5. Mouth
-                if (mouthAngle > 0) {
+                if (mouthAngle > 0 || isChasing) {
                     ctx.fillStyle = '#0a1d37';
                     ctx.beginPath();
                     ctx.moveTo(radius * 0.9, -radius * 0.1);
-                    ctx.lineTo(radius * 1.15, -radius * (0.1 + mouthAngle));
-                    ctx.lineTo(radius * 1.15, radius * (0.1 + mouthAngle));
+                    ctx.lineTo(radius * 1.15, -radius * (0.1 + (isChasing ? 0.3 : mouthAngle)));
+                    ctx.lineTo(radius * 1.15, radius * (0.1 + (isChasing ? 0.3 : mouthAngle)));
                     ctx.closePath();
                     ctx.fill();
                 }
 
                 if (isPlayer) {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+                    ctx.strokeStyle = isHiding ? '#38ef7d' : 'rgba(255, 255, 255, 0.7)';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.ellipse(0, 0, radius * 1.15, radius * 0.8, 0, 0, Math.PI * 2);
@@ -1034,6 +1067,25 @@
                 }
 
                 ctx.restore();
+
+                // 6. Overhead Indicators (Shark Chase Alert / Hiding Badge)
+                if (isChasing) {
+                    ctx.save();
+                    ctx.fillStyle = '#ff3333';
+                    ctx.font = `bold ${Math.max(16, radius * 0.4)}px Fredoka, sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText('!', x, y - radius * 1.2);
+                    ctx.restore();
+                }
+
+                if (isPlayer && isHiding) {
+                    ctx.save();
+                    ctx.fillStyle = '#38ef7d';
+                    ctx.font = 'bold 12px Fredoka, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🌱 Sembunyi (Aman)', x, y - radius * 1.3);
+                    ctx.restore();
+                }
             }
 
             update(timestamp) {
@@ -1058,6 +1110,11 @@
                         this.player.facingRight = dx > 0;
                     }
                 }
+                
+                // Cek apakah player bersembunyi di dasar laut (Area Algae & Terumbu Karang)
+                const hidingZoneY = this.canvas.height - 140;
+                this.player.isHiding = (this.player.y >= hidingZoneY);
+
                 this.player.swimCycle += 1;
                 if (this.player.mouthOpen > 0) this.player.mouthOpen -= 0.05;
                 if (this.player.invulnerableTimer > 0) this.player.invulnerableTimer--;
@@ -1069,12 +1126,39 @@
 
                 for (let i = this.fishes.length - 1; i >= 0; i--) {
                     const fish = this.fishes[i];
+
+                    // KHUSUS HANYA IKAN HIU BERUKURAN BESAR YANG MENGEJAR PLAYER
+                    // Ikan-ikan lain (Guppy, Clownfish, Tang, Kakap) TIDAK AKAN mengejar player
+                    const isSharkChaser = (fish.config.type === 'shark' && fish.radius >= 80);
+                    const distToPlayer = Math.hypot(this.player.x - fish.x, this.player.y - fish.y);
+                    const chaseDistance = 400; // Radius penglihatan Hiu
+
+                    if (isSharkChaser && !this.player.isHiding && distToPlayer < chaseDistance) {
+                        // Hanya Hiu Besar yang Mengejar Player!
+                        fish.isChasing = true;
+                        const angle = Math.atan2(this.player.y - fish.y, this.player.x - fish.x);
+                        const chaseSpeed = fish.config.speed * 1.4;
+                        fish.vx = Math.cos(angle) * chaseSpeed;
+                        fish.vy = Math.sin(angle) * chaseSpeed;
+                        fish.facingRight = fish.vx > 0;
+                    } else {
+                        // Ikan lain atau Hiu di luar jangkauan / player bersembunyi berenang biasa
+                        fish.isChasing = false;
+                        const defaultSpeed = fish.config.speed;
+                        const dir = fish.originalVxDir || (fish.vx >= 0 ? 1 : -1);
+                        fish.vx = dir * defaultSpeed;
+                        fish.vy = Math.sin(fish.x * 0.02) * 0.8;
+                        if (Math.abs(fish.vx) > 0.1) {
+                            fish.facingRight = fish.vx > 0;
+                        }
+                    }
+
                     fish.x += fish.vx;
-                    fish.y += Math.sin(fish.x * 0.02) * 0.8;
+                    fish.y += fish.vy;
                     fish.swimCycle += 1;
 
-                    if ((fish.vx > 0 && fish.x > this.canvas.width + 100) || 
-                        (fish.vx < 0 && fish.x < -100)) {
+                    if ((fish.vx > 0 && fish.x > this.canvas.width + 120) || 
+                        (fish.vx < 0 && fish.x < -120)) {
                         this.fishes.splice(i, 1);
                         continue;
                     }
@@ -1312,7 +1396,7 @@
 
                 // 8. Enemy Fishes
                 this.fishes.forEach(fish => {
-                    this.drawFish(this.ctx, fish.x, fish.y, fish.radius, fish.facingRight, fish.config, fish.swimCycle);
+                    this.drawFish(this.ctx, fish.x, fish.y, fish.radius, fish.facingRight, fish.config, fish.swimCycle, 0, false, fish.isChasing, false);
                 });
 
                 // 9. Player Fish
@@ -1327,7 +1411,7 @@
                         this.drawFish(
                             this.ctx, this.player.x, this.player.y, this.player.radius, 
                             this.player.facingRight, playerConfig, this.player.swimCycle, 
-                            this.player.mouthOpen, true
+                            this.player.mouthOpen, true, false, this.player.isHiding
                         );
                     }
                 }
