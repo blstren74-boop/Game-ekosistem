@@ -788,6 +788,8 @@
                 this.mouseY = 0;
                 this.lastSpawnTime = 0;
                 this.currentQuestion = null;
+                // Menyimpan indeks soal sebelumnya agar tidak berulang berurutan
+                this.lastQuestionIndex = -1;
 
                 this.initResize();
                 this.initEcosystemEnvironment();
@@ -1361,7 +1363,13 @@
                 document.getElementById('quizLivesLeft').innerText = this.lives;
                 document.getElementById('quizFeedback').classList.add('hidden');
 
-                const randomIdx = Math.floor(Math.random() * ecologyQuestions.length);
+                // Acak soal baru dengan memastikan tidak sama dengan soal terakhir yang muncul
+                let randomIdx;
+                do {
+                    randomIdx = Math.floor(Math.random() * ecologyQuestions.length);
+                } while (randomIdx === this.lastQuestionIndex && ecologyQuestions.length > 1);
+
+                this.lastQuestionIndex = randomIdx;
                 this.currentQuestion = ecologyQuestions[randomIdx];
                 
                 document.getElementById('quizNumberTag').innerText = `Soal #${randomIdx + 1} dari 20`;
